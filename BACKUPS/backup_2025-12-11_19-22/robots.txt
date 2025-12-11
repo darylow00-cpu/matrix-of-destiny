@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /compatibility.html
+Allow: /how-it-works.html
+Allow: /offer.html
+Allow: /privacy.html
+Allow: /assets/
+
+Disallow: /BACKUPS/
+Disallow: /*.py
+Disallow: /*.js~
+Disallow: /*?*
+
+Sitemap: https://www.xn--80aaxovl4a.site/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Yandexbot
+Allow: /
+
+# Delay for aggressive crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /

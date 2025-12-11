@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Как работает сервис — Матрица Судьбы</title>
+    <link rel="stylesheet" href="./assets/styles/normalize.css">
+    <link rel="stylesheet" href="./assets/styles/index.css">
+    <style>
+        .how-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .how-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .how-header h1 {
+            font-size: 42px;
+            color: #40286a;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .how-header p {
+            font-size: 16px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f6ff 100%);
+            border: 1px solid #e3d7f4;
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 74, 199, 0.08);
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(108, 74, 199, 0.15);
+            border-color: #b653f7;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #6c4ac7 0%, #b653f7 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 auto 16px;
+        }
+
+        .step-card h3 {
+            font-size: 18px;
+            color: #40286a;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .step-card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .features-section {
+            background: linear-gradient(135deg, #f8f6ff 0%, #ffffff 100%);
+            border: 1px solid #e3d7f4;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .features-section h2 {
+            font-size: 28px;
+            color: #40286a;
+            margin-bottom: 32px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #6c4ac7 0%, #b653f7 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-item h4 {
+            font-size: 14px;
+            color: #40286a;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .feature-item p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .tech-info {
+            background: linear-gradient(180deg, rgba(108, 74, 199, 0.05) 0%, rgba(182, 83, 247, 0.05) 100%);
+            border-left: 4px solid #6c4ac7;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 60px;
+        }
+
+        .tech-info h3 {
+            font-size: 16px;
+            color: #1f1f1f;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .tech-info p {
+            font-size: 13px;
+            color: #1f1f1f;
+            line-height: 1.6;
+            margin: 8px 0;
+        }
+
+        .tech-info strong {
+            color: #40286a;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .cta-section p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #6c4ac7 0%, #b653f7 100%);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(108, 74, 199, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .how-header h1 {
+                font-size: 32px;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .features-section {
+                padding: 24px;
+            }
+
+            .features-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="header">
+            <ul class="header-right">
+                <li>
+                    <a href="index.html" class="header__link">Личный расклад</a>
+                </li>
+                <li>
+                    <a href="compatibility.html" class="header__link">Совместимость</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="how-container">
+            <div class="how-header">
+                <h1>Как работает сервис</h1>
+                <p>Разберемся, как Матрица Судьбы помогает вам узнать себя и найти гармонию в жизни</p>
+            </div>
+
+            <!-- Шаги использования -->
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Введите свои данные</h3>
+                    <p>Укажите дату рождения и имя. Для анализа совместимости понадобятся также данные партнера.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Матрица строится автоматически</h3>
+                    <p>Алгоритм рассчитывает вашу личную матрицу на основе нумерологии и священной геометрии.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Получите подробный анализ</h3>
+                    <p>Система генерирует описание вашего типа, энергии, талантов и рекомендации для развития.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Раскройте свой потенциал</h3>
+                    <p>Используйте полученные знания для саморазвития, карьеры и гармоничных отношений.</p>
+                </div>
+            </div>
+
+            <!-- Что такое Матрица Судьбы -->
+            <div class="features-section">
+                <h2>Что такое Матрица Судьбы</h2>
+                
+                <div class="feature-item" style="margin-bottom: 24px;">
+                    <div style="flex: 1;">
+                        <p style="font-size: 14px; line-height: 1.6; color: #666; margin: 0;">
+                            <strong>Матрица Судьбы</strong> — это уникальная система самопознания, созданная на основе древней нумерологии и современных психологических знаний. Она раскрывает вашу врожденную природу, скрытые способности и жизненное предназначение.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature-item" style="margin-bottom: 24px;">
+                    <div style="flex: 1;">
+                        <p style="font-size: 14px; line-height: 1.6; color: #666; margin: 0;">
+                            Каждый человек рождается с определенной программой, которая зашифрована в дате его рождения. Матрица помогает расшифровать эту информацию и понять, какие сильные стороны нужно развивать, а какие блоки преодолевать.
+                        </p>
+                    </div>
+                </div>
+
+                <h3 style="color: #40286a; font-size: 18px; margin: 40px 0 20px; font-weight: 600;">Основные компоненты анализа:</h3>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">✦</div>
+                        <div>
+                            <h4>Основной архетип</h4>
+                            <p>Определяет вашу ключевую роль в жизни и основные жизненные задачи</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✦</div>
+                        <div>
+                            <h4>Энергетический тип</h4>
+                            <p>Показывает, как вы взаимодействуете с миром и влияете на людей</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✦</div>
+                        <div>
+                            <h4>Сферы жизни</h4>
+                            <p>Анализирует карьеру, отношения, финансы, здоровье и духовное развитие</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✦</div>
+                        <div>
+                            <h4>Совместимость</h4>
+                            <p>Показывает гармонию в отношениях и точки синергии с партнером</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✦</div>
+                        <div>
+                            <h4>Рекомендации</h4>
+                            <p>Конкретные советы для развития личности и достижения целей</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✦</div>
+                        <div>
+                            <h4>Числовые коды</h4>
+                            <p>Древние числовые последовательности, отражающие суть вашей матрицы</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Технические детали -->
+            <div class="tech-info">
+                <h3>Как работает расчет</h3>
+                <p><strong>Алгоритм анализирует:</strong> день, месяц и год рождения, преобразуя их в числовые коды, которые затем интерпретируются согласно древним эзотерическим учениям.</p>
+                <p><strong>Результат:</strong> вы получаете персональную матрицу с уникальными характеристиками, скрытыми талантами и рекомендациями по гармонизации жизни.</p>
+                <p><strong>Точность:</strong> система основана на проверенной временем нумерологии и показала свою действенность для тысяч пользователей по всему миру.</p>
+            </div>
+
+            <!-- Призыв к действию -->
+            <div class="cta-section">
+                <p>Готовы раскрыть тайны своей Матрицы Судьбы?</p>
+                <a href="index.html" class="cta-button">Рассчитать свою матрицу</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>О проекте</h4>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="how-it-works.html">Как работает сервис</a></li>
+                        <li><a href="compatibility.html">Пример отчёта совместимости</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Услуги</h4>
+                    <ul>
+                        <li>Личный расклад</li>
+                        <li>Совместимость</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Контакты</h4>
+                    <ul>
+                        <li><a href="mailto:dary.low.00@gmail.com">dary.low.00@gmail.com</a></li>
+                        <li>Время ответа: до 10 рабочих дней</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-links">
+                    <a href="offer.html">Публичная оферта</a>
+                    <span style="color: #333;">|</span>
+                    <a href="privacy.html">Политика конфиденциальности</a>
+                </div>
+                <p>&copy; 2025 Проект «Матрица Судьбы»</p>
+                <p>https://www.xn--80aaxovl4a.site/ — Все права защищены</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
