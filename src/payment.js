@@ -24,7 +24,14 @@ const PaymentService = {
                     user_data: userData
                 })
             });
-            
+
+            // Если сервер вернул HTML (например, вместо API), не пытаемся парсить как JSON
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Сервер вернул не JSON (status ${response.status}). Текст: ${text.slice(0, 200)}`);
+            }
+
             const data = await response.json();
             
             if (data.success) {
@@ -53,6 +60,13 @@ const PaymentService = {
     async checkPayment(paymentId) {
         try {
             const response = await fetch(`${this.serverUrl}/check-payment/${paymentId}`);
+
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Сервер вернул не JSON (status ${response.status}). Текст: ${text.slice(0, 200)}`);
+            }
+
             const data = await response.json();
             
             if (data.success) {
