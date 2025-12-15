@@ -1,1 +1,11 @@
 **/.DS_Store
+
+# Секретные ключи и настройки
+.env
+*.pyc
+__pycache__/
+*.log
+venv/
+*.swp
+*.swo
+*~

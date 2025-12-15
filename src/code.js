@@ -404,10 +404,6 @@ function outputYears(obj){
   }
 }
 
-// Кнопка GET YOUR FULL DESTINY MATRIX READING
-const decodematrixbtn = document.querySelector("#decode-matrix-btn");
-decodematrixbtn.addEventListener("click", function () {
-  window.location.href = "http://krisuniverse.com/rates";
-});
-
+// Кнопка получения полного расклада (обработчик в payment_handler.js)
 // Navigation simplified - no hamburger menu needed
+
