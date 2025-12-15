@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Оплата — Матрица Судьбы</title>
+  <link rel="stylesheet" href="./assets/styles/normalize.css" />
+  <link rel="stylesheet" href="./assets/styles/index.css" />
+  <meta name="robots" content="noindex" />
+  <style>
+    .pay-container { max-width: 840px; margin: 60px auto; padding: 24px; background: #0b0720; border: 1px solid rgba(182,83,247,.2); border-radius: 12px; }
+    .pay-title { color: #b653f7; font-size: 22px; margin-bottom: 12px; }
+    .pay-text { color: #cfcfcf; font-size: 14px; line-height: 1.7; }
+    .pay-actions { margin-top: 24px; display: flex; gap: 12px; }
+    .btn { background: linear-gradient(135deg,#6c4ac7 0%, #b653f7 100%); color:#fff; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; font-weight:600; }
+    .btn-outline { background: transparent; border:1px solid #b653f7; color:#b653f7; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="header">
+      <ul class="header-right">
+        <li><a href="index.html" class="header__link">Личный расклад</a></li>
+        <li><a href="compatibility.html" class="header__link">Совместимость</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="pay-container">
+      <h1 class="pay-title">Оплата услуги</h1>
+      <p class="pay-text">Если вы попали на эту страницу по ссылке оплаты — оплату инициирует кнопка на основной странице. Нажмите «Вернуться» и используйте кнопку «Получить полный расклад — 590 ₽». Мы перенаправим вас на защищенную страницу ЮKassa.</p>
+      <div class="pay-actions">
+        <button class="btn" id="start-pay">Начать оплату здесь</button>
+        <a class="btn btn-outline" href="index.html">Вернуться на главную</a>
+      </div>
+      <p class="pay-text" style="margin-top:16px">При успешной оплате доступ к платным блокам откроется автоматически, а статус сохранится в вашем браузере.</p>
+    </div>
+  </main>
+
+  <script src="./src/payment.js"></script>
+  <script>
+    document.getElementById('start-pay')?.addEventListener('click', async () => {
+      // По умолчанию считаем, что пользователь хотел оплатить персональный расклад
+      const res = await PaymentService.createPayment('personal');
+      if (res.success) {
+        PaymentService.redirectToPayment(res.confirmationUrl);
+      } else {
+        alert('Не удалось создать платеж: ' + (res.error || 'ошибка'));
+      }
+    });
+  </script>
+</body>
+</html>
