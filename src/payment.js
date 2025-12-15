@@ -4,7 +4,7 @@
 
 const PaymentService = {
     // URL вашего сервера обработки платежей
-    serverUrl: 'https://www.xn--80aaxovl4a.site', // URL сервера
+    serverUrl: 'https://matrix-backend.onrender.com', // Продакшн-бэкенд
     
     /**
      * Создание платежа
