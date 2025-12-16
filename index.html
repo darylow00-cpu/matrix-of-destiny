@@ -49,6 +49,60 @@
   </head>
 
   <body>
+    <div id="URGENT-DEBUG" style="display: block !important; visibility: visible !important; position: static !important; width: 100% !important; background: #ff6b6b !important; color: #000 !important; padding: 20px !important; font-family: Arial !important; font-size: 14px !important; line-height: 1.8 !important; text-align: left !important; z-index: 999999 !important; box-sizing: border-box !important; margin: 0 !important; border-bottom: 3px solid #000 !important;">
+      <strong style="display: block !important; color: #000 !important;">🚨 DEBUG PANEL - OVERFLOW CHECK 🚨</strong>
+      <span id="URG-TEXT" style="display: block !important; color: #000 !important; white-space: pre-wrap !important; font-family: monospace !important;">Loading analysis...</span>
+    </div>
+    <script>
+      (function() {
+        function analyze() {
+          const vw = window.innerWidth;
+          const dw = document.documentElement.scrollWidth;
+          const bw = document.body.scrollWidth;
+          const overflow = Math.max(dw, bw) - vw;
+          
+          let msg = `VIEWPORT: ${vw}px\n`;
+          msg += `DOC WIDTH: ${dw}px\n`;
+          msg += `BODY WIDTH: ${bw}px\n`;
+          msg += `OVERFLOW: ${overflow}px\n\n`;
+          
+          const bad = [];
+          document.querySelectorAll('*').forEach(el => {
+            const r = el.getBoundingClientRect();
+            if (r.right > vw + 1) {
+              bad.push({
+                tag: el.tagName,
+                id: el.id,
+                class: el.className,
+                width: r.width,
+                over: r.right - vw
+              });
+            }
+          });
+          
+          bad.sort((a,b) => b.over - a.over);
+          
+          if (bad.length > 0) {
+            msg += `⚠️ FOUND ${bad.length} OVERFLOWING ELEMENTS:\n\n`;
+            bad.slice(0, 8).forEach((item, i) => {
+              msg += `${i+1}. ${item.tag}`;
+              if (item.id) msg += ` ID="${item.id}"`;
+              if (item.class) msg += ` CLASS="${item.class.substring(0,40)}"`;
+              msg += `\n   Width: ${item.width.toFixed(0)}px | Overflow: +${item.over.toFixed(0)}px\n\n`;
+            });
+          } else {
+            msg += `✅ NO OVERFLOW FOUND!`;
+          }
+          
+          const el = document.getElementById('URG-TEXT');
+          if (el) el.textContent = msg;
+        }
+        
+        analyze();
+        window.addEventListener('load', analyze);
+        setInterval(analyze, 1000);
+      })();
+    </script>
     <header>
       <nav class="header">
         <ul class="header-right">
@@ -64,11 +118,6 @@
     <main>
       <div class="container">
         <div class="desteny-container">
-          <div id="debug-panel" style="background: #1a1a2e; color: #00ff00; padding: 20px; margin: 20px 0; border: 2px solid #00ff00; font-family: monospace; font-size: 12px; border-radius: 5px; width: 100%; box-sizing: border-box;">
-            <strong>🔍 DEBUG PANEL</strong><br>
-            <span id="debug-text">Analyzing...</span>
-          </div>
-          <div class="glow__wrap">
             <div class="glow"></div>
           </div>
           <p>??????????? ??????? ??????</p>
