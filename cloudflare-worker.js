@@ -113,9 +113,11 @@ async function createPayment(request, shopId, secretKey) {
       }, 200, request);
     } else {
       const errorText = await response.text();
+      console.log('YOOKASSA create-payment error', response.status, errorText.slice(0, 300));
       return jsonResponse({
         error: 'Ошибка создания платежа',
-        details: errorText
+        status: response.status,
+        details: errorText.slice(0, 500)
       }, response.status, request);
     }
     
@@ -146,9 +148,11 @@ async function checkPayment(paymentId, request, shopId, secretKey) {
       }, 200, request);
     } else {
       const errorText = await response.text();
+      console.log('YOOKASSA check-payment error', response.status, errorText.slice(0, 300));
       return jsonResponse({
         error: 'Ошибка проверки платежа',
-        details: errorText
+        status: response.status,
+        details: errorText.slice(0, 500)
       }, response.status, request);
     }
     
