@@ -6,7 +6,7 @@ const compatibilityContainer = document.querySelector('.compatibility-container'
 const compatibilitySpheresSection = document.querySelector('.compatibility-spheres');
 compatibilityContainer.classList.add('display-none');
 if (compatibilitySpheresSection) {
-    compatibilitySpheresSection.style.display = 'none';
+    compatibilitySpheresSection.classList.remove('show');
 }
 
 // ставит ограничитель в календаре на даты, которые не наступили
@@ -253,7 +253,7 @@ btnChart.addEventListener('click', (evt) => {
                 
                 // Показываем блоки сфер на мобильных
                 if (compatibilitySpheresSection) {
-                    compatibilitySpheresSection.style.display = 'block';
+                    compatibilitySpheresSection.classList.add('show');
                 }
         
         compatibilityContainer.classList.remove('display-none');
