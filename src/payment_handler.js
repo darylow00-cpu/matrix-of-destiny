@@ -199,30 +199,8 @@ function showLoadingIndicator() {
     if (button) {
         button.disabled = true;
         button.dataset.originalText = button.textContent;
-        // Маленькие пульсирующие точки (не двигаются)
-        button.innerHTML = `
-            <span style="display: inline-flex; align-items: center; gap: 4px;">
-                Переход к оплате
-                <span style="display: inline-flex; gap: 3px; margin-left: 4px;">
-                    <span style="width: 4px; height: 4px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
-                    <span style="width: 4px; height: 4px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.3s infinite;"></span>
-                    <span style="width: 4px; height: 4px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.6s infinite;"></span>
-                </span>
-            </span>
-        `;
-    }
-    
-    // Добавить анимацию пульсации, если её ещё нет
-    if (!document.getElementById('pulse-animation')) {
-        const style = document.createElement('style');
-        style.id = 'pulse-animation';
-        style.textContent = `
-            @keyframes pulse {
-                0%, 100% { opacity: 0.3; }
-                50% { opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
+        // Просто сменяем текст на "Переход к оплате..."
+        button.textContent = 'Переход к оплате...';
     }
 }
 
