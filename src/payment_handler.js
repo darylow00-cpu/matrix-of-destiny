@@ -2,40 +2,41 @@
  * Обработчик кнопки оплаты для разблокировки контента
  */
 
-// Добавить обработчик кнопки после загрузки DOM и PaymentService
+// Добавить обработчик кнопки после загрузки DOM (без жёсткой проверки PaymentService)
 document.addEventListener('DOMContentLoaded', () => {
-    // Ждем PaymentService с небольшими повторами (для медленных устройств/кэша)
-    waitForPaymentService(5, 300);
+    const paymentButton = document.getElementById('decode-matrix-btn');
+    if (paymentButton) {
+        paymentButton.addEventListener('click', handlePaymentClick);
+    }
 });
 
-function waitForPaymentService(retries = 5, delayMs = 300) {
-    if (typeof PaymentService !== 'undefined') {
-        console.log('[payment_handler] PaymentService is ready');
-        const paymentButton = document.getElementById('decode-matrix-btn');
-        if (paymentButton) {
-            paymentButton.addEventListener('click', handlePaymentClick);
+// Гарантируем, что PaymentService загружен (ленивая подгрузка при клике)
+async function ensurePaymentServiceReady(retries = 4, delayMs = 300) {
+    for (let i = 0; i <= retries; i++) {
+        if (typeof PaymentService !== 'undefined') {
+            console.log('[payment_handler] PaymentService ready');
+            return true;
         }
-        return;
+
+        if (i === retries) break;
+
+        console.warn('[payment_handler] PaymentService not ready, retrying load...', { attempt: i + 1 });
+        await new Promise(res => setTimeout(res, delayMs));
     }
 
-    if (retries <= 0) {
-        console.error('[payment_handler] PaymentService not loaded after retries. Trying to reload payment.js');
+    // Пытаемся динамически подгрузить payment.js
+    await new Promise((resolve) => {
         loadPaymentScript(() => {
-            if (typeof PaymentService !== 'undefined') {
-                console.log('[payment_handler] PaymentService loaded after dynamic script reload');
-                const paymentButton = document.getElementById('decode-matrix-btn');
-                if (paymentButton) {
-                    paymentButton.addEventListener('click', handlePaymentClick);
-                }
-            } else {
-                alert('Ошибка загрузки модуля оплаты. Обновите страницу или попробуйте другой браузер.');
-            }
+            resolve();
         });
-        return;
+    });
+
+    if (typeof PaymentService !== 'undefined') {
+        console.log('[payment_handler] PaymentService loaded via dynamic script');
+        return true;
     }
 
-    console.warn('[payment_handler] PaymentService not ready, retrying... attempts left:', retries);
-    setTimeout(() => waitForPaymentService(retries - 1, delayMs), delayMs);
+    return false;
 }
 
 // Динамическая подгрузка payment.js при сбое (для мобильных, когда кеш сломан)
@@ -64,6 +65,13 @@ async function handlePaymentClick() {
     console.log('[payment_handler] Button clicked');
     
     try {
+        // Убеждаемся, что модуль оплаты загружен
+        const ready = await ensurePaymentServiceReady();
+        if (!ready) {
+            alert('Не удалось загрузить модуль оплаты. Обновите страницу или попробуйте другой браузер.');
+            return;
+        }
+
         // Определить тип услуги по текущей странице
         const currentPage = window.location.pathname;
         const serviceType = currentPage.includes('compatibility') ? 'compatibility' : 'personal';
