@@ -776,6 +776,9 @@ button:hover {
   align-items: center;
   text-align: center;
   text-transform: uppercase;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
   text-shadow: 
     0 0 20px rgba(255, 255, 255, 0.6),
     0 0 40px rgba(182, 83, 247, 0.5),
@@ -798,6 +801,11 @@ button:hover {
     0 0 10px rgba(251, 228, 157, 0.6),
     0 0 20px rgba(182, 83, 247, 0.3);
   margin: 1em 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .gray {
@@ -1425,7 +1433,7 @@ tbody {
   }
 
   .pento {
-    padding: 0 5px;
+    padding: 0;
     margin: 0;
   }
 
@@ -1433,7 +1441,7 @@ tbody {
     margin: 1.5em auto;
     max-width: 100%;
     width: 100%;
-    padding: 0 5px;
+    padding: 0;
     box-sizing: border-box;
   }
 
