@@ -3,7 +3,11 @@ const inputFirstDate = document.getElementById("date_person1");
 const inputSecondDate = document.getElementById("date_person2");
 const btnChart = document.getElementById('createChart');
 const compatibilityContainer = document.querySelector('.compatibility-container');
+const compatibilitySpheresSection = document.querySelector('.compatibility-spheres');
 compatibilityContainer.classList.add('display-none');
+if (compatibilitySpheresSection) {
+    compatibilitySpheresSection.style.display = 'none';
+}
 
 // ставит ограничитель в календаре на даты, которые не наступили
 let today = new Date();
@@ -245,6 +249,11 @@ btnChart.addEventListener('click', (evt) => {
                 // Заполняем блоки совместимости (если функция определена)
                 if (typeof fillCompatibilitySpheres === 'function') {
                     fillCompatibilitySpheres(compatibility);
+                }
+                
+                // Показываем блоки сфер на мобильных
+                if (compatibilitySpheresSection) {
+                    compatibilitySpheresSection.style.display = 'block';
                 }
         
         compatibilityContainer.classList.remove('display-none');
