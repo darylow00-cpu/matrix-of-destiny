@@ -26,8 +26,10 @@ async function handlePaymentClick() {
         // Показать индикатор загрузки
         showLoadingIndicator();
         
-        // Создать платеж
-        const result = await PaymentService.createPayment(serviceType, userData);
+        // Создать платеж с возвратом на текущую страницу
+        const returnUrl = window.location.href;
+        localStorage.setItem('paymentReturnUrl', returnUrl);
+        const result = await PaymentService.createPayment(serviceType, userData, returnUrl);
         
         // Скрыть индикатор загрузки
         hideLoadingIndicator();

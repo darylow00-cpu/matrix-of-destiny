@@ -32,9 +32,10 @@ const PaymentService = {
      * Создание платежа
      * @param {string} serviceType - Тип услуги: 'personal' или 'compatibility'
      * @param {object} userData - Данные пользователя (опционально)
+     * @param {string} returnUrl - URL возврата после оплаты
      * @returns {Promise<object>}
      */
-    async createPayment(serviceType, userData = {}) {
+    async createPayment(serviceType, userData = {}, returnUrl = '') {
         try {
             const response = await fetch(`${this.serverUrl}/create-payment`, {
                 method: 'POST',
@@ -43,7 +44,8 @@ const PaymentService = {
                 },
                 body: JSON.stringify({
                     service_type: serviceType,
-                    user_data: userData
+                    user_data: userData,
+                    return_url: returnUrl
                 })
             });
 
@@ -135,6 +137,13 @@ const PaymentService = {
             const msg = result.error || 'Оплата не завершена или отменена.';
             alert(msg);
         }
+
+        // Вернуться на исходную страницу расчета, если сохраняли return_url
+        const desired = localStorage.getItem('paymentReturnUrl');
+        if (desired && desired !== window.location.href) {
+            localStorage.removeItem('paymentReturnUrl');
+            window.location.href = desired;
+        }
     },
     
     /**
@@ -187,6 +196,7 @@ const PaymentService = {
         localStorage.setItem('premiumAccessDate', new Date().toISOString());
         if (paymentId) {
             localStorage.setItem('premiumPaymentId', paymentId);
+            localStorage.setItem('premiumStatus', 'paid');
         }
     },
     
@@ -196,18 +206,20 @@ const PaymentService = {
     checkPremiumAccess() {
         const hasAccess = localStorage.getItem('premiumAccess') === 'true';
         const paymentId = localStorage.getItem('premiumPaymentId');
+        const status = localStorage.getItem('premiumStatus');
 
         // Если нет подтвержденного платежа, сбрасываем флаг
-        if (hasAccess && !paymentId) {
+        if (hasAccess && (!paymentId || status !== 'paid')) {
             localStorage.removeItem('premiumAccess');
             localStorage.removeItem('premiumAccessDate');
+            localStorage.removeItem('premiumStatus');
             return false;
         }
 
-        if (hasAccess && paymentId) {
+        if (hasAccess && paymentId && status === 'paid') {
             this.unlockContent(paymentId);
         }
-        return hasAccess && !!paymentId;
+        return hasAccess && !!paymentId && status === 'paid';
     }
 };
 

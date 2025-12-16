@@ -20,11 +20,8 @@ const PRICES = {
   }
 };
 
-// URL для возврата после оплаты
-const RETURN_URLS = {
-  personal: 'https://www.xn--80aaxovl4a.site/index.html',
-  compatibility: 'https://www.xn--80aaxovl4a.site/compatibility.html'
-};
+// Базовый URL для возврата; реальный return_url может прийти с клиента и быть проверен
+const BASE_RETURN_URL = 'https://www.xn--80aaxovl4a.site';
 
 // Генерация UUID для идемпотентности
 function generateUUID() {
@@ -65,7 +62,12 @@ async function createPayment(request, shopId, secretKey) {
     }
     
     const priceInfo = PRICES[serviceType];
-    const returnUrl = RETURN_URLS[serviceType];
+
+    // Разрешаем клиенту передать return_url, но проверяем, что он внутри нашего домена
+    let returnUrl = BASE_RETURN_URL;
+    if (data.return_url && typeof data.return_url === 'string' && data.return_url.startsWith(BASE_RETURN_URL)) {
+      returnUrl = data.return_url;
+    }
     const idempotenceKey = generateUUID();
     
     // Формирование запроса к ЮKassa
