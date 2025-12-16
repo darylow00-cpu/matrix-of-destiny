@@ -20,8 +20,8 @@ const PRICES = {
   }
 };
 
-// Разрешенный домен для возврата
-const ALLOWED_HOST = 'www.xn--80aaxovl4a.site';
+// Разрешенные домены для возврата
+const ALLOWED_HOSTS = ['www.xn--80aaxovl4a.site', 'xn--80aaxovl4a.site'];
 
 // Генерация UUID для идемпотентности
 function generateUUID() {
@@ -64,11 +64,11 @@ async function createPayment(request, shopId, secretKey) {
     const priceInfo = PRICES[serviceType];
 
     // Разрешаем клиенту передать return_url, но проверяем домен
-    let returnUrl = `https://${ALLOWED_HOST}`;
+    let returnUrl = `https://${ALLOWED_HOSTS[0]}`;
     if (data.return_url && typeof data.return_url === 'string') {
       try {
         const ru = new URL(data.return_url);
-        if (ru.hostname === ALLOWED_HOST && ru.protocol === 'https:') {
+        if (ALLOWED_HOSTS.includes(ru.hostname) && ru.protocol === 'https:') {
           returnUrl = ru.toString();
         }
       } catch (e) {
