@@ -22,8 +22,8 @@ const PRICES = {
 
 // URL для возврата после оплаты
 const RETURN_URLS = {
-  personal: 'https://www.xn--80aaxovl4a.site/index.html?payment=success',
-  compatibility: 'https://www.xn--80aaxovl4a.site/compatibility.html?payment=success'
+  personal: 'https://www.xn--80aaxovl4a.site/index.html',
+  compatibility: 'https://www.xn--80aaxovl4a.site/compatibility.html'
 };
 
 // Генерация UUID для идемпотентности

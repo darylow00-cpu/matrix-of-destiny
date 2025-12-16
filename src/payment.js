@@ -120,16 +120,21 @@ const PaymentService = {
     /**
      * Обработка возврата после оплаты
      */
-    handlePaymentReturn() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const paymentStatus = urlParams.get('payment');
-        
-        if (paymentStatus === 'success') {
-            // Показать уведомление об успешной оплате
+    async handlePaymentReturn() {
+        // Проверяем сохраненный платеж и дергаем статус у бэкенда
+        const paymentId = localStorage.getItem('currentPaymentId');
+        if (!paymentId) return;
+
+        const result = await this.checkPayment(paymentId);
+        // Очистим ID, чтобы не зациклить проверки
+        localStorage.removeItem('currentPaymentId');
+
+        if (result.success && result.paid) {
             this.showSuccessMessage();
-            
-            // Разблокировать контент
             this.unlockContent();
+        } else {
+            const msg = result.error || 'Оплата не завершена или отменена.';
+            alert(msg);
         }
     },
     
