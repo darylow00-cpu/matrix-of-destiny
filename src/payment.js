@@ -34,6 +34,7 @@ const PaymentService = {
      */
     restorePendingCalculation() {
         const raw = localStorage.getItem('paymentCalcData');
+        console.log('[payment] restorePendingCalculation called, data:', raw);
         if (!raw) return;
         let data;
         try {
@@ -45,6 +46,7 @@ const PaymentService = {
 
         const serviceType = data.serviceType || this.getCurrentServiceType();
         const userData = data.userData || {};
+        console.log('[payment] restoring', { serviceType, userData });
 
         if (serviceType === 'personal') {
             const d = document.getElementById('date');
@@ -53,17 +55,26 @@ const PaymentService = {
             if (n && userData.name) n.value = userData.name;
             // Автоматически пересчитать, если кнопка есть
             const btn = document.getElementById('get_the_answer');
+            console.log('[payment] personal button found:', !!btn);
             if (btn && userData.birthdate && userData.name) {
-                setTimeout(() => btn.click(), 50);
+                setTimeout(() => {
+                    console.log('[payment] clicking personal calc button');
+                    btn.click();
+                }, 100);
             }
         } else if (serviceType === 'compatibility') {
             const d1 = document.getElementById('date_person1');
             const d2 = document.getElementById('date_person2');
+            console.log('[payment] compat inputs found:', { d1: !!d1, d2: !!d2 });
             if (d1 && userData.partner1_birthdate) d1.value = userData.partner1_birthdate;
             if (d2 && userData.partner2_birthdate) d2.value = userData.partner2_birthdate;
             const btn = document.getElementById('createChart');
+            console.log('[payment] compat button found:', !!btn, 'data:', userData);
             if (btn && userData.partner1_birthdate && userData.partner2_birthdate) {
-                setTimeout(() => btn.click(), 50);
+                setTimeout(() => {
+                    console.log('[payment] clicking compat calc button');
+                    btn.click();
+                }, 200);
             }
         }
     },
@@ -339,8 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('premiumAccessDate');
     }
 
-    // Восстановить расчет после возврата/отмены
-    PaymentService.restorePendingCalculation();
+    // Задержка для восстановления расчета, чтобы все скрипты успели загрузиться
+    setTimeout(() => {
+        PaymentService.restorePendingCalculation();
+    }, 300);
 
     // Проверить статус оплаты при возврате
     PaymentService.handlePaymentReturn();

@@ -22,13 +22,16 @@ async function handlePaymentClick() {
         
         // Собрать данные пользователя
         const userData = collectUserData(serviceType);
+        console.log('[payment_handler] collected userData:', userData, 'serviceType:', serviceType);
         
         // Сохранить ключ текущей матрицы, чтобы разблокировать только её
         const matrixKey = buildMatrixKey(serviceType);
         localStorage.setItem('paymentMatrixKeyPending', matrixKey);
 
         // Сохранить данные расчета, чтобы восстановить после возврата
-        localStorage.setItem('paymentCalcData', JSON.stringify({ serviceType, userData }));
+        const calcData = { serviceType, userData };
+        localStorage.setItem('paymentCalcData', JSON.stringify(calcData));
+        console.log('[payment_handler] saved to localStorage:', calcData);
         
         // Показать индикатор загрузки
         showLoadingIndicator();
