@@ -15,11 +15,12 @@ const PaymentService = {
      */
     async checkHealth() {
         try {
-            const res = await fetch(`${this.serverUrl}/health`, { method: 'GET' });
+            const res = await fetch(`${this.serverUrl}/health`, { method: 'GET', mode: 'cors', cache: 'no-store', credentials: 'omit' });
             const ct = res.headers.get('content-type') || '';
             if (!ct.includes('application/json')) {
                 const text = await res.text();
-                return { ok: false, error: `Health returned non-JSON (status ${res.status}): ${text.slice(0, 120)}` };
+                console.warn('[health] non-JSON response', { url: res.url, status: res.status, type: res.type, text: text.slice(0, 200) });
+                return { ok: false, error: `Health returned non-JSON (status ${res.status})` };
             }
             const data = await res.json();
             return { ok: res.ok && data.status === 'ok' };
@@ -60,7 +61,7 @@ const PaymentService = {
             const d2 = document.getElementById('date_person2');
             if (d1 && userData.partner1_birthdate) d1.value = userData.partner1_birthdate;
             if (d2 && userData.partner2_birthdate) d2.value = userData.partner2_birthdate;
-            const btn = document.getElementById('compatibility-btn');
+            const btn = document.getElementById('createChart');
             if (btn && userData.partner1_birthdate && userData.partner2_birthdate) {
                 setTimeout(() => btn.click(), 50);
             }
@@ -81,6 +82,9 @@ const PaymentService = {
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                mode: 'cors',
+                cache: 'no-store',
+                credentials: 'omit',
                 body: JSON.stringify({
                     service_type: serviceType,
                     user_data: userData,
@@ -92,7 +96,8 @@ const PaymentService = {
             const contentType = response.headers.get('content-type') || '';
             if (!contentType.includes('application/json')) {
                 const text = await response.text();
-                throw new Error(`Сервер вернул не JSON (status ${response.status}). Текст: ${text.slice(0, 200)}`);
+                console.warn('[create-payment] non-JSON response', { url: response.url, status: response.status, type: response.type, text: text.slice(0, 200) });
+                throw new Error(`Сервер вернул не JSON (status ${response.status}).`);
             }
 
             const data = await response.json();
@@ -122,12 +127,13 @@ const PaymentService = {
      */
     async checkPayment(paymentId) {
         try {
-            const response = await fetch(`${this.serverUrl}/check-payment/${paymentId}`);
+            const response = await fetch(`${this.serverUrl}/check-payment/${paymentId}`, { method: 'GET', mode: 'cors', cache: 'no-store', credentials: 'omit' });
 
             const contentType = response.headers.get('content-type') || '';
             if (!contentType.includes('application/json')) {
                 const text = await response.text();
-                throw new Error(`Сервер вернул не JSON (status ${response.status}). Текст: ${text.slice(0, 200)}`);
+                console.warn('[check-payment] non-JSON response', { url: response.url, status: response.status, type: response.type, text: text.slice(0, 200) });
+                throw new Error(`Сервер вернул не JSON (status ${response.status}).`);
             }
 
             const data = await response.json();
@@ -275,6 +281,25 @@ const PaymentService = {
         if (matrixKey) {
             localStorage.setItem('premiumMatrixKey', matrixKey);
         }
+
+        // Если мы на странице совместимости, заполнить контент для ранее заблокированных сфер
+        try {
+            if (window.location.pathname.includes('compatibility') && typeof updateCompatibilitySphereContent === 'function') {
+                const spheres = document.querySelectorAll('[id^="sphere-"]');
+                spheres.forEach(item => {
+                    const sid = item.id;
+                    const arcSpan = item.querySelector(`#${sid}-arcana`);
+                    if (arcSpan) {
+                        const n = parseInt((arcSpan.textContent || '').trim(), 10);
+                        if (!Number.isNaN(n)) {
+                            updateCompatibilitySphereContent(sid, n);
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('[compatibility] post-unlock fill failed', e);
+        }
     },
     
     /**
@@ -307,6 +332,7 @@ const PaymentService = {
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
+    console.info('[payment] using serverUrl:', PaymentService.serverUrl);
     // Санитация устаревшего состояния оплаты
     if (localStorage.getItem('premiumAccess') === 'true' && !localStorage.getItem('premiumPaymentId')) {
         localStorage.removeItem('premiumAccess');

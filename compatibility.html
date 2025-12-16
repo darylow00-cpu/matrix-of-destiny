@@ -46,14 +46,14 @@
         <div class="birthday-container__inputs-wrapper-comp">
           <label class="label-partner1" for="partner1">Партнер 1</label>
           <div class="input1-wrap">
-            <input id="date_person1" name="partner1" type="date" />
+            <input id="date_person1" name="partner1" type="date" autocomplete="bday" />
             <div class="star__wrap2">
               <img class="star-size-m" src="./assets/img/starmedium.svg" />
             </div>
           </div>
           <label class="label-partner2" for="partner2">Партнер 2</label>
           <div class="input2-wrap">
-            <input id="date_person2" name="partner2" type="date" />
+            <input id="date_person2" name="partner2" type="date" autocomplete="bday" />
             <div class="star__wrap3">
               <img class="star-size-m" src="./assets/img/starmedium.svg" />
             </div>
@@ -808,6 +808,188 @@
             </tbody>
           </table>
         </div>
+        <section class="compatibility-spheres">
+          <div class="personal-calculator">
+            <p class="smoky-white">Расшифровка совместимости</p>
+          </div>
+
+          <div id="sphere-1" class="sphere-item">
+            <div class="sphere-header">
+              <h3>Фундамент отношений</h3>
+              <span class="sphere-arcana" id="sphere-1-arcana"></span>
+            </div>
+            <div class="sphere-content">
+              <div class="sphere-description"></div>
+            </div>
+          </div>
+
+          <div id="sphere-2" class="sphere-item">
+            <div class="sphere-header">
+              <h3>Эмоциональная гармония</h3>
+              <span class="sphere-arcana" id="sphere-2-arcana"></span>
+            </div>
+            <div class="sphere-content">
+              <div class="sphere-description"></div>
+            </div>
+          </div>
+
+          <div id="sphere-3" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Сексуальная совместимость</h3>
+              <span class="sphere-arcana" id="sphere-3-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-4" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Бытовая совместимость</h3>
+              <span class="sphere-arcana" id="sphere-4-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-5" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Финансовая гармония</h3>
+              <span class="sphere-arcana" id="sphere-5-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-6" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Социальная совместимость</h3>
+              <span class="sphere-arcana" id="sphere-6-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-7" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Совместные цели и амбиции</h3>
+              <span class="sphere-arcana" id="sphere-7-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-8" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Мужская энергия</h3>
+              <span class="sphere-arcana" id="sphere-8-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-9" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Женская энергия</h3>
+              <span class="sphere-arcana" id="sphere-9-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-10" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Сила союза</h3>
+              <span class="sphere-arcana" id="sphere-10-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-11" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Кармическая суть</h3>
+              <span class="sphere-arcana" id="sphere-11-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-12" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Стабильность и долговечность</h3>
+              <span class="sphere-arcana" id="sphere-12-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-13" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Общие дела и проекты</h3>
+              <span class="sphere-arcana" id="sphere-13-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+
+          <div id="sphere-14" class="sphere-item locked">
+            <div class="locked-overlay">
+              <img class="lock-premium-icon" src="assets/img/premium-lock.svg" alt="Premium">
+              <div class="locked-premium-text">Premium</div>
+              <div class="locked-premium-subtext">Разблокировать</div>
+            </div>
+            <div class="sphere-header">
+              <h3>Привязанность и забота</h3>
+              <span class="sphere-arcana" id="sphere-14-arcana"></span>
+            </div>
+            <div class="sphere-content"><div class="sphere-description"></div></div>
+          </div>
+        </section>
+
         <div class="center center_container">
           <div class="glow-btn__wrap">
             <div class="glow-btn"></div>
