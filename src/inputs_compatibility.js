@@ -190,6 +190,11 @@ btnChart.addEventListener('click', (evt) => {
     
     console.log('[DEBUG COMPAT] Dates:', { calculationDateFirst, calculationDateSecond });
     
+    // Проверяем, совпадает ли текущая матрица с оплаченной
+    if (typeof PaymentService !== 'undefined' && PaymentService.resetPremiumIfKeyMismatch) {
+      PaymentService.resetPremiumIfKeyMismatch();
+    }
+    
     const wrongDate = document.querySelector('.wrongDate');
     const output2 = document.querySelector('.output2');
     const response = valideDates(date1, date2);

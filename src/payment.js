@@ -348,6 +348,68 @@ const PaymentService = {
             return true;
         }
         return false;
+    },
+
+    /**
+     * Сбросить премиум-доступ, если ключ матрицы не совпадает с текущим
+     * Вызывается перед каждым новым расчётом
+     */
+    resetPremiumIfKeyMismatch() {
+        const storedKey = localStorage.getItem('premiumMatrixKey') || '';
+        const currentKey = this.getCurrentMatrixKey();
+        
+        console.log('[payment] Checking matrix key:', { storedKey, currentKey });
+        
+        // Если ключи не совпадают — сбрасываем премиум доступ
+        if (storedKey && storedKey !== currentKey) {
+            console.log('[payment] Matrix key mismatch - clearing premium access');
+            localStorage.removeItem('premiumAccess');
+            localStorage.removeItem('premiumAccessDate');
+            localStorage.removeItem('premiumStatus');
+            localStorage.removeItem('premiumPaymentId');
+            localStorage.removeItem('premiumMatrixKey');
+            
+            // Восстанавливаем замки на странице
+            this.restoreLocks();
+            return false;
+        }
+        
+        return true;
+    },
+
+    /**
+     * Восстановить замки на заблокированных элементах
+     */
+    restoreLocks() {
+        console.log('[payment] Restoring locks');
+        
+        // Находим все элементы с premium-контентом
+        const lockedElements = document.querySelectorAll('[data-premium="true"]');
+        
+        lockedElements.forEach(element => {
+            // Скрываем контент
+            element.style.filter = 'blur(5px)';
+            element.style.pointerEvents = 'none';
+            element.style.userSelect = 'none';
+            
+            // Ищем или создаем замок
+            let lockOverlay = element.querySelector('.premium-lock-overlay');
+            if (!lockOverlay) {
+                lockOverlay = document.createElement('div');
+                lockOverlay.className = 'premium-lock-overlay';
+                lockOverlay.innerHTML = `
+                    <svg class="lock-icon" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M12 1C8.676 1 6 3.676 6 7v2H5c-1.105 0-2 .895-2 2v10c0 1.105.895 2 2 2h14c1.105 0 2-.895 2-2V11c0-1.105-.895-2-2-2h-1V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v2H8V7c0-2.276 1.724-4 4-4zm0 10c1.105 0 2 .895 2 2s-.895 2-2 2-2-.895-2-2 .895-2 2-2z"/>
+                    </svg>
+                    <span class="lock-text">Премиум контент</span>
+                `;
+                element.style.position = 'relative';
+                element.appendChild(lockOverlay);
+            } else {
+                lockOverlay.style.display = 'flex';
+            }
+        });
+    }
     }
 };
 

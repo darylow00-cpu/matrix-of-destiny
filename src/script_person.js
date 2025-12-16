@@ -67,6 +67,11 @@ btnAnswer.addEventListener('click', (evt) => {
     
     console.log('[DEBUG] Input values:', { calculationDate, name, date });
     
+    // Проверяем, совпадает ли текущая матрица с оплаченной
+    if (typeof PaymentService !== 'undefined' && PaymentService.resetPremiumIfKeyMismatch) {
+      PaymentService.resetPremiumIfKeyMismatch();
+    }
+    
     const errorOutput = document.querySelector('.errorOutput');
     const output = document.querySelector('.output-personal-date');
     const response = valide(date, name);
