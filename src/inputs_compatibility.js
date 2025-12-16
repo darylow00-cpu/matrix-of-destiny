@@ -259,7 +259,8 @@ btnChart.addEventListener('click', (evt) => {
         compatibilityContainer.classList.remove('display-none');
         compatibilityContainer.scrollIntoView({behavior: "smooth", block: "start"});
         outputCompatibilityMatrixValues();
-        clearInputs(inputFirstDate, inputSecondDate);
+        // Не очищаем инпуты, чтобы можно было восстановить расчет после возврата с оплаты
+        // clearInputs(inputFirstDate, inputSecondDate);
     }
 });
 
