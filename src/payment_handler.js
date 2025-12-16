@@ -46,31 +46,21 @@ async function handlePaymentClick() {
             return `${serviceType}|${d}|${n}`;
         }
         
-        // ТЕСТОВЫЙ РЕЖИМ: эмулируем успешную оплату без реального платежа
-        console.log('[payment_handler TEST MODE] Эмуляция успешной оплаты без реального запроса');
+        // Создать платеж через backend
+        const result = await PaymentService.createPayment(590, serviceType, userData);
         
         // Скрыть индикатор загрузки
         hideLoadingIndicator();
         
-        // Имитируем успешный платеж
-        const fakePaymentId = 'test_payment_' + Date.now();
-        localStorage.setItem('currentPaymentId', fakePaymentId);
-        localStorage.setItem('premiumAccess', 'true');
-        localStorage.setItem('premiumAccessDate', new Date().toISOString());
-        localStorage.setItem('premiumPaymentId', fakePaymentId);
-        localStorage.setItem('premiumStatus', 'paid');
-        localStorage.setItem('premiumMatrixKey', matrixKey);
-        
-        // Показать сообщение об успехе
-        PaymentService.showSuccessMessage();
-        
-        // Разблокировать контент
-        PaymentService.unlockContent(fakePaymentId, matrixKey);
-        
-        // Убрать сохраненные данные расчета
-        localStorage.removeItem('paymentCalcData');
-        localStorage.removeItem('paymentMatrixKeyPending');
-        localStorage.removeItem('currentPaymentId');
+        if (result.success) {
+            // Сохранить ID платежа
+            localStorage.setItem('currentPaymentId', result.paymentId);
+            
+            // Перенаправить на страницу оплаты
+            PaymentService.redirectToPayment(result.confirmationUrl);
+        } else {
+            throw new Error(result.error || 'Не удалось создать платеж');
+        }
     } catch (error) {
         hideLoadingIndicator();
         console.error('Ошибка при обработке платежа:', error);
