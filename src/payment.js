@@ -179,7 +179,7 @@ const PaymentService = {
             error: lastError?.message || 'Не удалось создать платеж'
         };
     },
-    },
+    
     
     /**
      * Проверка статуса платежа
