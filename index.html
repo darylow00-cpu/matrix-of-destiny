@@ -1788,6 +1788,43 @@
         setInterval(runDebug, 2000);
       })();
     </script>
+    
+    <div style="background-color: red; color: black; padding: 20px; margin-top: 50px; font-family: Arial; font-size: 12px; white-space: pre-wrap;">
+      <strong>DEBUG ANALYSIS</strong>
+      <div id="simple-debug">Calculating...</div>
+    </div>
+    
+    <script>
+      document.getElementById('simple-debug').innerText = (function() {
+        const vw = window.innerWidth;
+        const dw = document.documentElement.scrollWidth;
+        const bw = document.body.scrollWidth;
+        let text = 'Viewport: ' + vw + 'px\nDoc: ' + dw + 'px\nBody: ' + bw + 'px\n';
+        text += 'Overflow: ' + (Math.max(dw, bw) - vw) + 'px\n\n';
+        
+        const bad = [];
+        document.querySelectorAll('*').forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.right > vw + 1) {
+            bad.push({tag: el.tagName, id: el.id, cls: el.className, w: r.width, over: r.right - vw});
+          }
+        });
+        bad.sort((a,b) => b.over - a.over);
+        
+        if (bad.length > 0) {
+          text += 'OVERFLOWING ELEMENTS:\n';
+          bad.slice(0, 5).forEach((item, i) => {
+            text += (i+1) + '. ' + item.tag;
+            if (item.id) text += ' ID=' + item.id;
+            if (item.cls) text += ' CLASS=' + item.cls.substring(0, 30);
+            text += '\n   Width: ' + Math.round(item.w) + 'px | Overflow: +' + Math.round(item.over) + 'px\n';
+          });
+        } else {
+          text += 'NO OVERFLOW FOUND!';
+        }
+        return text;
+      })();
+    </script>
   </body>
 </html>
 
