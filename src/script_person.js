@@ -60,6 +60,40 @@ btnAnswer.addEventListener('click', (evt) => {
     evt.preventDefault();
     
     console.log('[DEBUG] Button clicked');
+    
+    // OVERFLOW DEBUG
+    setTimeout(() => {
+      const vw = window.innerWidth;
+      const dw = document.documentElement.scrollWidth;
+      const bw = document.body.scrollWidth;
+      const overflow = Math.max(dw, bw) - vw;
+      
+      let msg = `📱 AFTER BUTTON CLICK\nViewport: ${vw}px\nDoc: ${dw}px\nBody: ${bw}px\nOVERFLOW: ${overflow}px\n\n`;
+      
+      const bad = [];
+      document.querySelectorAll('*').forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.right > vw + 1) {
+          bad.push({tag: el.tagName, id: el.id, cls: el.className.split(' ')[0], w: r.width, over: r.right - vw});
+        }
+      });
+      bad.sort((a,b) => b.over - a.over);
+      
+      if (bad.length > 0) {
+        msg += `TOP OVERFLOWING ELEMENTS:\n`;
+        bad.slice(0, 5).forEach((item, i) => {
+          msg += `${i+1}. ${item.tag}`;
+          if (item.id) msg += ` ID:${item.id}`;
+          if (item.cls) msg += ` CLASS:${item.cls}`;
+          msg += `\n   +${Math.round(item.over)}px overflow\n`;
+        });
+      } else {
+        msg += `NO OVERFLOW ELEMENTS`;
+      }
+      
+      alert(msg);
+      console.log(msg);
+    }, 100);
 
     const date = new Date(document.getElementById('date').value);
     const calculationDate = document.getElementById('date').value;
