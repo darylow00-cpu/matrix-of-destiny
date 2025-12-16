@@ -80,55 +80,77 @@ const PaymentService = {
     },
     
     /**
-     * Создание платежа
+     * Создание платежа с retry логикой
      * @param {string} serviceType - Тип услуги: 'personal' или 'compatibility'
      * @param {object} userData - Данные пользователя (опционально)
      * @param {string} returnUrl - URL возврата после оплаты
      * @returns {Promise<object>}
      */
     async createPayment(serviceType, userData = {}, returnUrl = '') {
-        try {
-            const response = await fetch(`${this.serverUrl}/create-payment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                mode: 'cors',
-                cache: 'no-store',
-                credentials: 'omit',
-                body: JSON.stringify({
-                    service_type: serviceType,
-                    user_data: userData,
-                    return_url: returnUrl
-                })
-            });
+        const maxRetries = 2;
+        let lastError = null;
+        
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                if (attempt > 0) {
+                    console.log(`[payment] Retry attempt ${attempt}/${maxRetries}`);
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                }
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                
+                const response = await fetch(`${this.serverUrl}/create-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors',
+                    cache: 'no-store',
+                    credentials: 'omit',
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        service_type: serviceType,
+                        user_data: userData,
+                        return_url: returnUrl
+                    })
+                });
+                
+                clearTimeout(timeoutId);
 
-            // Если сервер вернул HTML (например, вместо API), не пытаемся парсить как JSON
-            const contentType = response.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-                const text = await response.text();
-                console.warn('[create-payment] non-JSON response', { url: response.url, status: response.status, type: response.type, text: text.slice(0, 200) });
-                throw new Error(`Сервер вернул не JSON (status ${response.status}).`);
-            }
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.warn('[create-payment] non-JSON response', { url: response.url, status: response.status, type: response.type, text: text.slice(0, 200) });
+                    throw new Error(`Сервер вернул не JSON (status ${response.status}).`);
+                }
 
-            const data = await response.json();
-            
-            if (data.success) {
-                return {
-                    success: true,
-                    paymentId: data.payment_id,
-                    confirmationUrl: data.confirmation_url
-                };
-            } else {
-                throw new Error(data.error || 'Ошибка создания платежа');
+                const data = await response.json();
+                
+                if (data.success) {
+                    return {
+                        success: true,
+                        paymentId: data.payment_id,
+                        confirmationUrl: data.confirmation_url
+                    };
+                } else {
+                    throw new Error(data.error || 'Ошибка создания платежа');
+                }
+            } catch (error) {
+                lastError = error;
+                console.error(`Ошибка создания платежа (попытка ${attempt + 1}):`, error.message);
+                
+                if (attempt === maxRetries) {
+                    break;
+                }
             }
-        } catch (error) {
-            console.error('Ошибка создания платежа:', error);
-            return {
-                success: false,
-                error: error.message
-            };
         }
+        
+        return {
+            success: false,
+            error: lastError?.message || 'Не удалось создать платеж'
+        };
+    },
     },
     
     /**
@@ -431,22 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Проверить сохраненный доступ
     PaymentService.checkPremiumAccess();
-
-    // Легкий health-check backend, чтобы заранее подсветить проблемы
-    PaymentService.checkHealth().then((h) => {
-        if (!h.ok) {
-            console.warn('Платёжный сервер недоступен:', h.error || 'unknown error');
-            const banner = document.createElement('div');
-            banner.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#2b223f;color:#fff;border:1px solid #b653f7;padding:12px 16px;border-radius:10px;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,0.3);max-width:340px;font-size:13px;line-height:1.5;';
-            banner.innerHTML = `
-                <strong style="color:#b653f7;">Оплата временно недоступна</strong><br/>
-                Сервер: <code>${PaymentService.serverUrl}</code><br/>
-                ${h.error ? 'Ошибка: ' + h.error : 'Причина не определена'}
-            `;
-            document.body.appendChild(banner);
-            setTimeout(() => banner.remove(), 8000);
-        }
-    });
 });
 
 // Экспорт для использования в других скриптах
