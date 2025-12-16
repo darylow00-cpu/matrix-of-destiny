@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Гарантируем, что PaymentService загружен (ленивая подгрузка при клике)
 async function ensurePaymentServiceReady(retries = 4, delayMs = 300) {
+    // 1) Ждем наличие PaymentService
     for (let i = 0; i <= retries; i++) {
         if (typeof PaymentService !== 'undefined') {
             console.log('[payment_handler] PaymentService ready');
@@ -24,18 +25,30 @@ async function ensurePaymentServiceReady(retries = 4, delayMs = 300) {
         await new Promise(res => setTimeout(res, delayMs));
     }
 
-    // Пытаемся динамически подгрузить payment.js
+    // 2) Проверяем, есть ли статический тег payment.js
+    const staticTag = Array.from(document.scripts).find(s => (s.src || '').includes('/src/payment.js'));
+    if (!staticTag) {
+        console.warn('[payment_handler] Static payment.js tag not found, will inject dynamically');
+    }
+
+    // 3) Пытаемся динамически подгрузить payment.js
     await new Promise((resolve) => {
         loadPaymentScript(() => {
             resolve();
         });
     });
 
-    if (typeof PaymentService !== 'undefined') {
-        console.log('[payment_handler] PaymentService loaded via dynamic script');
-        return true;
+    // 4) После динамической загрузки снова ждём и проверяем
+    for (let i = 0; i <= retries; i++) {
+        if (typeof PaymentService !== 'undefined') {
+            console.log('[payment_handler] PaymentService loaded via dynamic script');
+            return true;
+        }
+        if (i === retries) break;
+        await new Promise(res => setTimeout(res, delayMs));
     }
 
+    console.error('[payment_handler] PaymentService still undefined after dynamic load');
     return false;
 }
 
@@ -44,7 +57,9 @@ function loadPaymentScript(onLoaded) {
     const existing = document.querySelector('script[data-dynamic-payment="true"]');
     if (existing) existing.remove();
     const script = document.createElement('script');
-    script.src = `./src/payment.js?v=2025-12-16q&reload=${Date.now()}`;
+    // Абсолютный путь исключает проблемы с base/относительными путями на мобильных
+    const origin = window.location.origin || '';
+    script.src = `${origin}/src/payment.js?v=2025-12-16s&reload=${Date.now()}`;
     script.async = false;
     script.dataset.dynamicPayment = 'true';
     script.onload = () => {
@@ -54,6 +69,7 @@ function loadPaymentScript(onLoaded) {
     script.onerror = () => {
         console.error('[payment_handler] Failed to dynamically load payment.js');
         alert('Не удалось загрузить модуль оплаты. Попробуйте обновить страницу.');
+        onLoaded && onLoaded();
     };
     document.head.appendChild(script);
 }
