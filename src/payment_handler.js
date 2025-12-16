@@ -2,8 +2,15 @@
  * Обработчик кнопки оплаты для разблокировки контента
  */
 
-// Добавить обработчик кнопки после загрузки DOM
+// Добавить обработчик кнопки после загрузки DOM и PaymentService
 document.addEventListener('DOMContentLoaded', () => {
+    // Проверяем, что PaymentService загружен
+    if (typeof PaymentService === 'undefined') {
+        console.error('[payment_handler] PaymentService not loaded! Check if payment.js is included before payment_handler.js');
+        alert('Ошибка загрузки модуля оплаты. Перезагрузите страницу.');
+        return;
+    }
+    
     const paymentButton = document.getElementById('decode-matrix-btn');
     
     if (paymentButton) {

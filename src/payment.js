@@ -329,6 +329,9 @@ const PaymentService = {
                 overlay.remove();
             }
         });
+        // Экспорт для использования в других скриптах (сразу, до DOMContentLoaded)
+        window.PaymentService = PaymentService;
+
         
         // Сохранить статус оплаты в localStorage
         localStorage.setItem('premiumAccess', 'true');
@@ -480,6 +483,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Проверить сохраненный доступ
     PaymentService.checkPremiumAccess();
 });
-
-// Экспорт для использования в других скриптах
-window.PaymentService = PaymentService;
