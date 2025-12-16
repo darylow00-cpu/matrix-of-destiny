@@ -3,8 +3,30 @@
  */
 
 const PaymentService = {
-    // URL вашего сервера обработки платежей
-    serverUrl: 'https://matrix-backend.onrender.com', // Продакшн-бэкенд
+    // URL сервера обработки платежей: авто-переключение dev/prod
+    serverUrl: (function() {
+        const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        return isLocal ? 'http://127.0.0.1:5000' : 'https://matrix-payment.darya-chubik.workers.dev';
+    })(),
+
+    /**
+     * Проверка здоровья backend
+     * @returns {Promise<{ok:boolean, error?:string}>}
+     */
+    async checkHealth() {
+        try {
+            const res = await fetch(`${this.serverUrl}/health`, { method: 'GET' });
+            const ct = res.headers.get('content-type') || '';
+            if (!ct.includes('application/json')) {
+                const text = await res.text();
+                return { ok: false, error: `Health returned non-JSON (status ${res.status}): ${text.slice(0, 120)}` };
+            }
+            const data = await res.json();
+            return { ok: res.ok && data.status === 'ok' };
+        } catch (e) {
+            return { ok: false, error: e.message };
+        }
+    },
     
     /**
      * Создание платежа
@@ -180,6 +202,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Проверить сохраненный доступ
     PaymentService.checkPremiumAccess();
+
+    // Легкий health-check backend, чтобы заранее подсветить проблемы
+    PaymentService.checkHealth().then((h) => {
+        if (!h.ok) {
+            console.warn('Платёжный сервер недоступен:', h.error || 'unknown error');
+            const banner = document.createElement('div');
+            banner.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#2b223f;color:#fff;border:1px solid #b653f7;padding:12px 16px;border-radius:10px;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,0.3);max-width:340px;font-size:13px;line-height:1.5;';
+            banner.innerHTML = `
+                <strong style="color:#b653f7;">Оплата временно недоступна</strong><br/>
+                Сервер: <code>${PaymentService.serverUrl}</code><br/>
+                ${h.error ? 'Ошибка: ' + h.error : 'Причина не определена'}
+            `;
+            document.body.appendChild(banner);
+            setTimeout(() => banner.remove(), 8000);
+        }
+    });
 });
 
 // Экспорт для использования в других скриптах
