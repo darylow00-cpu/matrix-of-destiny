@@ -121,7 +121,6 @@ const PaymentService = {
      * Обработка возврата после оплаты
      */
     async handlePaymentReturn() {
-        // Проверяем сохраненный платеж и дергаем статус у бэкенда
         const paymentId = localStorage.getItem('currentPaymentId');
         if (!paymentId) return;
 
@@ -131,7 +130,7 @@ const PaymentService = {
 
         if (result.success && result.paid) {
             this.showSuccessMessage();
-            this.unlockContent();
+            this.unlockContent(paymentId);
         } else {
             const msg = result.error || 'Оплата не завершена или отменена.';
             alert(msg);
@@ -172,7 +171,7 @@ const PaymentService = {
     /**
      * Разблокировать платный контент
      */
-    unlockContent() {
+    unlockContent(paymentId = '') {
         // Убрать замки с премиум блоков
         const lockedItems = document.querySelectorAll('.locked');
         lockedItems.forEach(item => {
@@ -186,6 +185,9 @@ const PaymentService = {
         // Сохранить статус оплаты в localStorage
         localStorage.setItem('premiumAccess', 'true');
         localStorage.setItem('premiumAccessDate', new Date().toISOString());
+        if (paymentId) {
+            localStorage.setItem('premiumPaymentId', paymentId);
+        }
     },
     
     /**
@@ -193,15 +195,30 @@ const PaymentService = {
      */
     checkPremiumAccess() {
         const hasAccess = localStorage.getItem('premiumAccess') === 'true';
-        if (hasAccess) {
-            this.unlockContent();
+        const paymentId = localStorage.getItem('premiumPaymentId');
+
+        // Если нет подтвержденного платежа, сбрасываем флаг
+        if (hasAccess && !paymentId) {
+            localStorage.removeItem('premiumAccess');
+            localStorage.removeItem('premiumAccessDate');
+            return false;
         }
-        return hasAccess;
+
+        if (hasAccess && paymentId) {
+            this.unlockContent(paymentId);
+        }
+        return hasAccess && !!paymentId;
     }
 };
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
+    // Санитация устаревшего состояния оплаты
+    if (localStorage.getItem('premiumAccess') === 'true' && !localStorage.getItem('premiumPaymentId')) {
+        localStorage.removeItem('premiumAccess');
+        localStorage.removeItem('premiumAccessDate');
+    }
+
     // Проверить статус оплаты при возврате
     PaymentService.handlePaymentReturn();
     
