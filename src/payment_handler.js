@@ -47,7 +47,8 @@ async function handlePaymentClick() {
         }
         
         // Создать платеж через backend
-        const result = await PaymentService.createPayment(590, serviceType, userData);
+        const returnUrl = window.location.href; // Вернуться на текущую страницу
+        const result = await PaymentService.createPayment(serviceType, userData, returnUrl);
         
         // Скрыть индикатор загрузки
         hideLoadingIndicator();
