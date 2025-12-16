@@ -39,13 +39,13 @@ async function ensurePaymentServiceReady(retries = 4, delayMs = 300) {
     });
 
     // 4) После динамической загрузки снова ждём и проверяем
-    for (let i = 0; i <= retries; i++) {
+    for (let i = 0; i <= retries + 2; i++) {
         if (typeof PaymentService !== 'undefined') {
             console.log('[payment_handler] PaymentService loaded via dynamic script');
             return true;
         }
         if (i === retries) break;
-        await new Promise(res => setTimeout(res, delayMs));
+        await new Promise(res => setTimeout(res, delayMs * 2));
     }
 
     console.error('[payment_handler] PaymentService still undefined after dynamic load');
@@ -57,10 +57,11 @@ function loadPaymentScript(onLoaded) {
     const existing = document.querySelector('script[data-dynamic-payment="true"]');
     if (existing) existing.remove();
     const script = document.createElement('script');
-    // Абсолютный путь исключает проблемы с base/относительными путями на мобильных
-    const origin = window.location.origin || '';
-    script.src = `${origin}/src/payment.js?v=2025-12-16s&reload=${Date.now()}`;
+    // Надёжно строим URL скрипта: учитываем поддиректорию и кэш-бастинг
+    const scriptUrl = new URL('src/payment.js', window.location.href).toString();
+    script.src = `${scriptUrl}?v=2025-12-16t&reload=${Date.now()}`;
     script.async = false;
+    script.crossOrigin = 'anonymous';
     script.dataset.dynamicPayment = 'true';
     script.onload = () => {
         console.log('[payment_handler] payment.js dynamically loaded');
