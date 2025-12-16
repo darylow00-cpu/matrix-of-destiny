@@ -1,3 +1,6 @@
+// SCRIPT LOADED - DEBUG ALERT
+alert('script_person.js loaded!');
+
 const dateInput = document.getElementById("date");
 const nameInput = document.getElementById("name");
 
@@ -13,8 +16,10 @@ if (!container) {
 const btnAnswer = document.getElementById('get_the_answer');
 if (!btnAnswer) {
   console.error('Button #get_the_answer not found');
+  alert('ERROR: Button #get_the_answer not found!');
 } else {
   console.log('[SCRIPT_PERSON] Button found, attaching listener');
+  alert('Button found! ID: get_the_answer');
 }
 
 // Проверяем наличие необходимых функций из code.js
