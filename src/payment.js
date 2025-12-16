@@ -110,6 +110,27 @@ const PaymentService = {
             };
         }
     },
+
+    /**
+     * Определить текущий тип услуги по URL
+     */
+    getCurrentServiceType() {
+        return window.location.pathname.includes('compatibility') ? 'compatibility' : 'personal';
+    },
+
+    /**
+     * Построить ключ текущей матрицы (чтобы не открывать чужие расчеты)
+     */
+    getCurrentMatrixKey(serviceType = this.getCurrentServiceType()) {
+        if (serviceType === 'compatibility') {
+            const d1 = document.getElementById('date_person1')?.value || '';
+            const d2 = document.getElementById('date_person2')?.value || '';
+            return `${serviceType}|${d1}|${d2}`;
+        }
+        const d = document.getElementById('date')?.value || '';
+        const n = (document.getElementById('name')?.value || '').trim();
+        return `${serviceType}|${d}|${n}`;
+    },
     
     /**
      * Перенаправление на страницу оплаты
@@ -130,9 +151,12 @@ const PaymentService = {
         // Очистим ID, чтобы не зациклить проверки
         localStorage.removeItem('currentPaymentId');
 
+        const pendingKey = localStorage.getItem('paymentMatrixKeyPending') || '';
+        localStorage.removeItem('paymentMatrixKeyPending');
+
         if (result.success && result.paid) {
             this.showSuccessMessage();
-            this.unlockContent(paymentId);
+            this.unlockContent(paymentId, pendingKey || this.getCurrentMatrixKey());
         } else {
             const msg = result.error || 'Оплата не завершена или отменена.';
             alert(msg);
@@ -143,6 +167,8 @@ const PaymentService = {
         if (desired && desired !== window.location.href) {
             localStorage.removeItem('paymentReturnUrl');
             window.location.href = desired;
+        } else {
+            localStorage.removeItem('paymentReturnUrl');
         }
     },
     
@@ -180,7 +206,7 @@ const PaymentService = {
     /**
      * Разблокировать платный контент
      */
-    unlockContent(paymentId = '') {
+    unlockContent(paymentId = '', matrixKey = '') {
         // Убрать замки с премиум блоков
         const lockedItems = document.querySelectorAll('.locked');
         lockedItems.forEach(item => {
@@ -198,6 +224,9 @@ const PaymentService = {
             localStorage.setItem('premiumPaymentId', paymentId);
             localStorage.setItem('premiumStatus', 'paid');
         }
+        if (matrixKey) {
+            localStorage.setItem('premiumMatrixKey', matrixKey);
+        }
     },
     
     /**
@@ -207,19 +236,24 @@ const PaymentService = {
         const hasAccess = localStorage.getItem('premiumAccess') === 'true';
         const paymentId = localStorage.getItem('premiumPaymentId');
         const status = localStorage.getItem('premiumStatus');
+        const storedKey = localStorage.getItem('premiumMatrixKey') || '';
+        const currentKey = this.getCurrentMatrixKey();
 
-        // Если нет подтвержденного платежа, сбрасываем флаг
-        if (hasAccess && (!paymentId || status !== 'paid')) {
+        // Если нет подтвержденного платежа или ключ не совпадает с текущей матрицей — сбрасываем
+        if (hasAccess && (!paymentId || status !== 'paid' || !storedKey || storedKey !== currentKey)) {
             localStorage.removeItem('premiumAccess');
             localStorage.removeItem('premiumAccessDate');
             localStorage.removeItem('premiumStatus');
+            localStorage.removeItem('premiumPaymentId');
+            localStorage.removeItem('premiumMatrixKey');
             return false;
         }
 
-        if (hasAccess && paymentId && status === 'paid') {
-            this.unlockContent(paymentId);
+        if (hasAccess && paymentId && status === 'paid' && storedKey === currentKey) {
+            this.unlockContent(paymentId, storedKey);
+            return true;
         }
-        return hasAccess && !!paymentId && status === 'paid';
+        return false;
     }
 };
 

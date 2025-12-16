@@ -23,8 +23,22 @@ async function handlePaymentClick() {
         // Собрать данные пользователя
         const userData = collectUserData(serviceType);
         
+        // Сохранить ключ текущей матрицы, чтобы разблокировать только её
+        const matrixKey = buildMatrixKey(serviceType);
+        localStorage.setItem('paymentMatrixKeyPending', matrixKey);
+        
         // Показать индикатор загрузки
         showLoadingIndicator();
+        function buildMatrixKey(serviceType) {
+            if (serviceType === 'compatibility') {
+                const d1 = document.getElementById('date_person1')?.value || '';
+                const d2 = document.getElementById('date_person2')?.value || '';
+                return `${serviceType}|${d1}|${d2}`;
+            }
+            const d = document.getElementById('date')?.value || '';
+            const n = (document.getElementById('name')?.value || '').trim();
+            return `${serviceType}|${d}|${n}`;
+        }
         
         // Создать платеж с возвратом на текущую страницу
         const returnUrl = window.location.href;
