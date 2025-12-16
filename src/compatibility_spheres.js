@@ -163,56 +163,78 @@ function fillCompatibilitySpheres(compatibility) {
       }
     }
   }
+  
+  // После заполнения всех блоков инициализируем аккордеон
+  console.log('[compatibility] Инициализация аккордеона после заполнения');
+  initializeCompatibilityAccordion();
 }
 
-// Инициализация аккордеона для блоков совместимости
-document.addEventListener('DOMContentLoaded', function() {
+// Функция для инициализации аккордеона
+function initializeCompatibilityAccordion() {
   const compatibilitySpheres = document.querySelectorAll('#sphere-1, #sphere-2, #sphere-3, #sphere-4, #sphere-5, #sphere-6, #sphere-7, #sphere-8, #sphere-9, #sphere-10, #sphere-11, #sphere-12, #sphere-13, #sphere-14');
   
   if (compatibilitySpheres.length === 0) {
-    console.log('[compatibility] Блоки совместимости не найдены (возможно, это не страница совместимости)');
+    console.log('[compatibility.accordion] Блоки совместимости не найдены');
     return;
   }
 
-  console.log('[compatibility] Найдено блоков совместимости:', compatibilitySpheres.length);
+  console.log('[compatibility.accordion] Инициализация аккордеона для', compatibilitySpheres.length, 'блоков');
   
   compatibilitySpheres.forEach(item => {
     const header = item.querySelector('.sphere-header');
     
     if (!header) {
-      console.warn('[compatibility] Заголовок не найден для блока', item.id);
+      console.warn('[compatibility.accordion] Заголовок не найден для блока', item.id);
       return;
     }
     
-    header.addEventListener('click', function() {
-      // Проверяем, заблокирован ли блок
-      if (item.classList.contains('locked')) {
-        // Прокручиваем к кнопке для покупки полного чтения
-        const purchaseBtn = document.getElementById('decode-matrix-btn');
-        if (purchaseBtn) {
-          purchaseBtn.scrollIntoView({behavior: 'smooth', block: 'center'});
-          console.log('[compatibility] Прокрутка к кнопке покупки для заблокированного блока');
-        }
-        return;
-      }
-      
-      // Проверяем, был ли блок уже открыт
-      const wasActive = item.classList.contains('active');
-      
-      // Закрываем все блоки
-      compatibilitySpheres.forEach(otherItem => {
-        otherItem.classList.remove('active');
-      });
-      
-      // Если блок не был активен, открываем его
-      if (!wasActive) {
-        item.classList.add('active');
-        
-        // Плавная прокрутка к началу открытого блока
-        setTimeout(() => {
-          item.scrollIntoView({behavior: 'smooth', block: 'start'});
-        }, 100);
-      }
-    });
+    // Удаляем старые обработчики клика если они есть
+    header.removeEventListener('click', handleSphereHeaderClick);
+    // Добавляем новый обработчик
+    header.addEventListener('click', handleSphereHeaderClick);
   });
-});
+  
+  console.log('[compatibility.accordion] Аккордеон инициализирован');
+}
+
+// Обработчик клика на заголовок сферы
+function handleSphereHeaderClick(event) {
+  const header = this;
+  const item = header.closest('.sphere-item');
+  
+  if (!item) return;
+  
+  // Проверяем, заблокирован ли блок
+  if (item.classList.contains('locked')) {
+    // Прокручиваем к кнопке для покупки полного чтения
+    const purchaseBtn = document.getElementById('decode-matrix-btn');
+    if (purchaseBtn) {
+      purchaseBtn.scrollIntoView({behavior: 'smooth', block: 'center'});
+      console.log('[compatibility.accordion] Прокрутка к кнопке покупки для', item.id);
+    }
+    return;
+  }
+  
+  // Проверяем, был ли блок уже открыт
+  const wasActive = item.classList.contains('active');
+  
+  // Закрываем все блоки
+  const allSpheres = document.querySelectorAll('#sphere-1, #sphere-2, #sphere-3, #sphere-4, #sphere-5, #sphere-6, #sphere-7, #sphere-8, #sphere-9, #sphere-10, #sphere-11, #sphere-12, #sphere-13, #sphere-14');
+  allSpheres.forEach(otherItem => {
+    otherItem.classList.remove('active');
+  });
+  
+  // Если блок не был активен, открываем его
+  if (!wasActive) {
+    item.classList.add('active');
+    
+    // Плавная прокрутка к началу открытого блока
+    setTimeout(() => {
+      item.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }, 100);
+    
+    console.log('[compatibility.accordion] Открыт блок', item.id);
+  } else {
+    console.log('[compatibility.accordion] Закрыт блок', item.id);
+  }
+}
