@@ -1627,7 +1627,7 @@ tbody {
 .sphere-item {
   margin-bottom: 1.2em;
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
   background: linear-gradient(135deg, rgba(182, 83, 247, 0.08) 0%, rgba(234, 70, 49, 0.08) 100%);
   border: 1px solid rgba(182, 83, 247, 0.2);
   box-shadow: 
@@ -1855,6 +1855,7 @@ tbody {
   pointer-events: none;
   border-radius: 20px;
   padding: 2em;
+  overflow: visible;
 }
 
 .lock-premium-icon {
