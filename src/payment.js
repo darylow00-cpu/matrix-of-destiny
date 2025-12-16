@@ -90,17 +90,22 @@ const PaymentService = {
         const maxRetries = 2;
         let lastError = null;
         
+        // Определяем таймаут в зависимости от устройства (больше для мобильных)
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const timeoutMs = isMobile ? 30000 : 15000;
+        
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
             try {
                 if (attempt > 0) {
                     console.log(`[payment] Retry attempt ${attempt}/${maxRetries}`);
-                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                    await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
                 }
                 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                // Используем AbortController только если поддерживается
+                let controller = null;
+                let timeoutId = null;
                 
-                const response = await fetch(`${this.serverUrl}/create-payment`, {
+                const fetchOptions = {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -108,15 +113,22 @@ const PaymentService = {
                     mode: 'cors',
                     cache: 'no-store',
                     credentials: 'omit',
-                    signal: controller.signal,
                     body: JSON.stringify({
                         service_type: serviceType,
                         user_data: userData,
                         return_url: returnUrl
                     })
-                });
+                };
                 
-                clearTimeout(timeoutId);
+                if (typeof AbortController !== 'undefined') {
+                    controller = new AbortController();
+                    fetchOptions.signal = controller.signal;
+                    timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                }
+                
+                const response = await fetch(`${this.serverUrl}/create-payment`, fetchOptions);
+                
+                if (timeoutId) clearTimeout(timeoutId);
 
                 const contentType = response.headers.get('content-type') || '';
                 if (!contentType.includes('application/json')) {
