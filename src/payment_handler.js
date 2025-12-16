@@ -198,20 +198,6 @@ function showLoadingIndicator() {
     const button = document.getElementById('decode-matrix-btn');
     if (button) {
         button.disabled = true;
-        button.dataset.originalText = button.textContent;
-        button.innerHTML = `
-            <span style="display: inline-flex; align-items: center; gap: 8px;">
-                <span style="
-                    width: 16px;
-                    height: 16px;
-                    border: 2px solid rgba(255, 255, 255, 0.3);
-                    border-top-color: white;
-                    border-radius: 50%;
-                    animation: spin 0.8s linear infinite;
-                "></span>
-                Переход к оплате...
-            </span>
-        `;
     }
     
     // Добавить анимацию вращения, если её ещё нет
@@ -225,6 +211,51 @@ function showLoadingIndicator() {
         `;
         document.head.appendChild(style);
     }
+
+    // Создать фиксированный оверлей с индикатором загрузки (не двигает контент)
+    if (!document.getElementById('payment-loading-overlay')) {
+        const overlay = document.createElement('div');
+        overlay.id = 'payment-loading-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        `;
+        overlay.innerHTML = `
+            <div style="
+                background: white;
+                border-radius: 12px;
+                padding: 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            ">
+                <span style="
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid #e0e0e0;
+                    border-top-color: #b653f7;
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                "></span>
+                <span style="
+                    font-size: 14px;
+                    color: #333;
+                    font-weight: 500;
+                ">Переход к оплате...</span>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+    }
 }
 
 /**
@@ -232,9 +263,14 @@ function showLoadingIndicator() {
  */
 function hideLoadingIndicator() {
     const button = document.getElementById('decode-matrix-btn');
-    if (button && button.dataset.originalText) {
+    if (button) {
         button.disabled = false;
-        button.textContent = button.dataset.originalText;
+    }
+
+    // Удалить оверлей с индикатором загрузки
+    const overlay = document.getElementById('payment-loading-overlay');
+    if (overlay) {
+        overlay.remove();
     }
 }
 
