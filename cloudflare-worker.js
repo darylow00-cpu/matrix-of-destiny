@@ -20,8 +20,8 @@ const PRICES = {
   }
 };
 
-// Базовый URL для возврата; реальный return_url может прийти с клиента и быть проверен
-const BASE_RETURN_URL = 'https://www.xn--80aaxovl4a.site';
+// Разрешенный домен для возврата
+const ALLOWED_HOST = 'www.xn--80aaxovl4a.site';
 
 // Генерация UUID для идемпотентности
 function generateUUID() {
@@ -63,10 +63,17 @@ async function createPayment(request, shopId, secretKey) {
     
     const priceInfo = PRICES[serviceType];
 
-    // Разрешаем клиенту передать return_url, но проверяем, что он внутри нашего домена
-    let returnUrl = BASE_RETURN_URL;
-    if (data.return_url && typeof data.return_url === 'string' && data.return_url.startsWith(BASE_RETURN_URL)) {
-      returnUrl = data.return_url;
+    // Разрешаем клиенту передать return_url, но проверяем домен
+    let returnUrl = `https://${ALLOWED_HOST}`;
+    if (data.return_url && typeof data.return_url === 'string') {
+      try {
+        const ru = new URL(data.return_url);
+        if (ru.hostname === ALLOWED_HOST && ru.protocol === 'https:') {
+          returnUrl = ru.toString();
+        }
+      } catch (e) {
+        // ignore invalid URL
+      }
     }
     const idempotenceKey = generateUUID();
     
@@ -231,6 +238,7 @@ export default {
     // Роутинг
     if (path === '/create-payment' && method === 'POST') {
       console.log('YOOKASSA create-payment using shopId', SHOP_ID_ENV, 'key prefix', SECRET_KEY_ENV.slice(0, 6));
+      console.log('YOOKASSA return_url', request.method);
       return createPayment(request, SHOP_ID_ENV, SECRET_KEY_ENV);
     }
     
