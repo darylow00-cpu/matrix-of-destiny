@@ -46,24 +46,31 @@ async function handlePaymentClick() {
             return `${serviceType}|${d}|${n}`;
         }
         
-        // Создать платеж с возвратом на текущую страницу
-        const returnUrl = window.location.href;
-        localStorage.setItem('paymentReturnUrl', returnUrl);
-        const result = await PaymentService.createPayment(serviceType, userData, returnUrl);
+        // ТЕСТОВЫЙ РЕЖИМ: эмулируем успешную оплату без реального платежа
+        console.log('[payment_handler TEST MODE] Эмуляция успешной оплаты без реального запроса');
         
         // Скрыть индикатор загрузки
         hideLoadingIndicator();
         
-        if (result.success) {
-            // Сохранить ID платежа
-            localStorage.setItem('currentPaymentId', result.paymentId);
-            
-            // Перенаправить на страницу оплаты
-            PaymentService.redirectToPayment(result.confirmationUrl);
-        } else {
-            // Показать сообщение об ошибке
-            showErrorMessage(result.error || 'Не удалось создать платеж. Попробуйте позже.');
-        }
+        // Имитируем успешный платеж
+        const fakePaymentId = 'test_payment_' + Date.now();
+        localStorage.setItem('currentPaymentId', fakePaymentId);
+        localStorage.setItem('premiumAccess', 'true');
+        localStorage.setItem('premiumAccessDate', new Date().toISOString());
+        localStorage.setItem('premiumPaymentId', fakePaymentId);
+        localStorage.setItem('premiumStatus', 'paid');
+        localStorage.setItem('premiumMatrixKey', matrixKey);
+        
+        // Показать сообщение об успехе
+        PaymentService.showSuccessMessage();
+        
+        // Разблокировать контент
+        PaymentService.unlockContent(fakePaymentId, matrixKey);
+        
+        // Убрать сохраненные данные расчета
+        localStorage.removeItem('paymentCalcData');
+        localStorage.removeItem('paymentMatrixKeyPending');
+        localStorage.removeItem('currentPaymentId');
     } catch (error) {
         hideLoadingIndicator();
         console.error('Ошибка при обработке платежа:', error);

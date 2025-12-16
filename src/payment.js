@@ -307,6 +307,16 @@ const PaymentService = {
                         }
                     }
                 });
+            } else if (typeof updateSphereContent === 'function') {
+                // Личный расчёт: подставляем тексты для ранее заблокированных сфер
+                const arcanaSpans = document.querySelectorAll('.sphere-arcana[id^="sphere-"]');
+                arcanaSpans.forEach(span => {
+                    const sid = span.id;
+                    const n = parseInt((span.textContent || '').trim(), 10);
+                    if (!Number.isNaN(n)) {
+                        updateSphereContent(sid, n);
+                    }
+                });
             }
         } catch (e) {
             console.warn('[compatibility] post-unlock fill failed', e);
