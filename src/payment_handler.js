@@ -15,10 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
  * Обработка клика по кнопке оплаты
  */
 async function handlePaymentClick() {
+    console.log('[payment_handler] Button clicked');
+    
     try {
         // Определить тип услуги по текущей странице
         const currentPage = window.location.pathname;
         const serviceType = currentPage.includes('compatibility') ? 'compatibility' : 'personal';
+        
+        console.log('[payment_handler] Service type:', serviceType, 'Page:', currentPage);
         
         // Собрать данные пользователя
         const userData = collectUserData(serviceType);
@@ -34,7 +38,9 @@ async function handlePaymentClick() {
         console.log('[payment_handler] saved to localStorage:', calcData);
         
         // Показать индикатор загрузки
+        console.log('[payment_handler] Showing loading indicator');
         showLoadingIndicator();
+        
         function buildMatrixKey(serviceType) {
             if (serviceType === 'compatibility') {
                 const d1 = document.getElementById('date_person1')?.value || '';
@@ -47,8 +53,11 @@ async function handlePaymentClick() {
         }
         
         // Создать платеж через backend
+        console.log('[payment_handler] Creating payment...');
         const returnUrl = window.location.href; // Вернуться на текущую страницу
         const result = await PaymentService.createPayment(serviceType, userData, returnUrl);
+        
+        console.log('[payment_handler] Payment result:', result);
         
         // Скрыть индикатор загрузки
         hideLoadingIndicator();

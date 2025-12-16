@@ -87,6 +87,8 @@ const PaymentService = {
      * @returns {Promise<object>}
      */
     async createPayment(serviceType, userData = {}, returnUrl = '') {
+        console.log('[payment] createPayment called', { serviceType, userData, returnUrl });
+        
         const maxRetries = 2;
         let lastError = null;
         
@@ -94,12 +96,16 @@ const PaymentService = {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         const timeoutMs = isMobile ? 30000 : 15000;
         
+        console.log('[payment] Device:', isMobile ? 'Mobile' : 'Desktop', 'Timeout:', timeoutMs + 'ms');
+        
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
             try {
                 if (attempt > 0) {
                     console.log(`[payment] Retry attempt ${attempt}/${maxRetries}`);
                     await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
                 }
+                
+                console.log(`[payment] Attempt ${attempt + 1}: Sending request to ${this.serverUrl}/create-payment`);
                 
                 // Используем AbortController только если поддерживается
                 let controller = null;
@@ -123,12 +129,19 @@ const PaymentService = {
                 if (typeof AbortController !== 'undefined') {
                     controller = new AbortController();
                     fetchOptions.signal = controller.signal;
-                    timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                    timeoutId = setTimeout(() => {
+                        console.log('[payment] Request timeout, aborting...');
+                        controller.abort();
+                    }, timeoutMs);
+                } else {
+                    console.log('[payment] AbortController not supported');
                 }
                 
                 const response = await fetch(`${this.serverUrl}/create-payment`, fetchOptions);
                 
                 if (timeoutId) clearTimeout(timeoutId);
+                
+                console.log('[payment] Response received:', response.status, response.statusText);
 
                 const contentType = response.headers.get('content-type') || '';
                 if (!contentType.includes('application/json')) {
@@ -138,6 +151,7 @@ const PaymentService = {
                 }
 
                 const data = await response.json();
+                console.log('[payment] Response data:', data);
                 
                 if (data.success) {
                     return {
@@ -150,7 +164,7 @@ const PaymentService = {
                 }
             } catch (error) {
                 lastError = error;
-                console.error(`Ошибка создания платежа (попытка ${attempt + 1}):`, error.message);
+                console.error(`[payment] Ошибка создания платежа (попытка ${attempt + 1}):`, error.name, error.message);
                 
                 if (attempt === maxRetries) {
                     break;
