@@ -4,19 +4,29 @@
 
 // Добавить обработчик кнопки после загрузки DOM и PaymentService
 document.addEventListener('DOMContentLoaded', () => {
-    // Проверяем, что PaymentService загружен
-    if (typeof PaymentService === 'undefined') {
-        console.error('[payment_handler] PaymentService not loaded! Check if payment.js is included before payment_handler.js');
-        alert('Ошибка загрузки модуля оплаты. Перезагрузите страницу.');
+    // Ждем PaymentService с небольшими повторами (для медленных устройств/кэша)
+    waitForPaymentService(5, 300);
+});
+
+function waitForPaymentService(retries = 5, delayMs = 300) {
+    if (typeof PaymentService !== 'undefined') {
+        console.log('[payment_handler] PaymentService is ready');
+        const paymentButton = document.getElementById('decode-matrix-btn');
+        if (paymentButton) {
+            paymentButton.addEventListener('click', handlePaymentClick);
+        }
         return;
     }
-    
-    const paymentButton = document.getElementById('decode-matrix-btn');
-    
-    if (paymentButton) {
-        paymentButton.addEventListener('click', handlePaymentClick);
+
+    if (retries <= 0) {
+        console.error('[payment_handler] PaymentService not loaded after retries');
+        alert('Ошибка загрузки модуля оплаты. Обновите страницу или попробуйте другой браузер.');
+        return;
     }
-});
+
+    console.warn('[payment_handler] PaymentService not ready, retrying... attempts left:', retries);
+    setTimeout(() => waitForPaymentService(retries - 1, delayMs), delayMs);
+}
 
 /**
  * Обработка клика по кнопке оплаты
