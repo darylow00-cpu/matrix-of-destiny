@@ -104,7 +104,6 @@ btnAnswer.addEventListener('click', (evt) => {
       Purposes();
       fillSphereArcanas(person, calculationDate);
       outputYears(person.years);
-      clearInputs(dateInput, nameInput);
       
       const sphereExplanations = document.querySelector('.sphere-explanations');
       if (sphereExplanations) {

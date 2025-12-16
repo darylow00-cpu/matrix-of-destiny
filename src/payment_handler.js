@@ -26,6 +26,9 @@ async function handlePaymentClick() {
         // Сохранить ключ текущей матрицы, чтобы разблокировать только её
         const matrixKey = buildMatrixKey(serviceType);
         localStorage.setItem('paymentMatrixKeyPending', matrixKey);
+
+        // Сохранить данные расчета, чтобы восстановить после возврата
+        localStorage.setItem('paymentCalcData', JSON.stringify({ serviceType, userData }));
         
         // Показать индикатор загрузки
         showLoadingIndicator();
