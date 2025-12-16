@@ -14,7 +14,7 @@
     debugBox.style.cssText = `
       position: fixed;
       bottom: 10px;
-      left: 10px;
+      right: 10px;
       background: rgba(0, 0, 0, 0.9);
       color: #0f0;
       font-family: monospace;
