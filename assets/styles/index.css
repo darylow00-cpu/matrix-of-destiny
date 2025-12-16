@@ -21,6 +21,7 @@ body {
   font-size: clamp(14px, 1.2vw, 18px);
   position: relative;
   overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
   max-width: 100vw;
   margin: 0;
@@ -44,13 +45,15 @@ body::before {
 }
 
 .container {
-  max-width: 1920px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   position: relative;
   z-index: 1;
   width: 100%;
   overflow-x: hidden;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 header,
@@ -876,11 +879,13 @@ button:hover {
 
 .pento {
   width: 100%;
+  max-width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
+  position: relative;
 }
 
 .display-none {
@@ -891,10 +896,10 @@ button:hover {
   float: none;
   margin: 2.5em auto;
   width: 100%;
-  max-width: 800px;
+  max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 :not(svg) {
@@ -902,8 +907,9 @@ button:hover {
 }
 
 svg:not(:root) {
-  overflow-clip-margin: content-box;
   overflow: hidden;
+  max-width: 100%;
+  height: auto;
 }
 
 text {
@@ -1400,10 +1406,17 @@ tbody {
   .compatibility-container,
   .pento {
     overflow-x: hidden !important;
+    overflow-y: auto !important;
     width: 100% !important;
     max-width: 100vw !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  * {
+    max-width: 100vw !important;
   }
 
   header,
@@ -1448,8 +1461,10 @@ tbody {
   }
 
   svg {
-    max-width: 100%;
-    height: auto;
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: hidden !important;
   }
 }
 
@@ -1519,7 +1534,13 @@ tbody {
 
   svg {
     max-width: 100% !important;
-    height: auto;
+    width: 100% !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  * {
+    max-width: 100vw !important;
   }
 
   .sphere-explanations {
