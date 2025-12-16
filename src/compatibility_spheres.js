@@ -20,25 +20,34 @@ const COMPATIBILITY_SPHERE_MAPPING = {
 
 // Функция для получения расшифровки аркана для конкретной сферы
 function getCompatibilityDescription(arcanaNumber, sphereId) {
+  console.log(`[compatibility.desc] Получение расшифровки для аркана ${arcanaNumber}, сфера ${sphereId}`);
+  console.log('[compatibility.desc] COMPATIBILITY_TEXTS существует:', !!COMPATIBILITY_TEXTS);
+  
   if (!COMPATIBILITY_TEXTS || !COMPATIBILITY_TEXTS[arcanaNumber]) {
-    console.warn('[compatibility] Аркан не найден:', arcanaNumber);
+    console.warn('[compatibility.desc] Аркан не найден:', arcanaNumber);
+    console.log('[compatibility.desc] Доступные арканы:', Object.keys(COMPATIBILITY_TEXTS || {}));
     return null;
   }
 
   const sphereName = COMPATIBILITY_SPHERE_MAPPING[sphereId];
   if (!sphereName) {
-    console.warn('[compatibility] Неизвестный ID сферы:', sphereId);
+    console.warn('[compatibility.desc] Неизвестный ID сферы:', sphereId);
     return null;
   }
 
+  console.log(`[compatibility.desc] Поиск сферы "${sphereName}" в аркане ${arcanaNumber}`);
   const arcanaData = COMPATIBILITY_TEXTS[arcanaNumber];
+  console.log('[compatibility.desc] Структура arcanaData:', Object.keys(arcanaData));
+  
   const description = arcanaData.spheres[sphereName];
   
   if (!description) {
-    console.warn('[compatibility] Расшифровка не найдена для аркана', arcanaNumber, 'и сферы', sphereName);
+    console.warn('[compatibility.desc] Расшифровка не найдена для аркана', arcanaNumber, 'и сферы', sphereName);
+    console.log('[compatibility.desc] Доступные сферы:', Object.keys(arcanaData.spheres || {}));
     return null;
   }
 
+  console.log(`[compatibility.desc] Расшифровка найдена (${description.length} символов)`);
   return {
     title: arcanaData.title,
     text: description
@@ -61,17 +70,19 @@ function formatCompatibilityDescription(text, arcanaTitle) {
 
 // Функция для обновления содержимого блока совместимости
 function updateCompatibilitySphereContent(sphereId, arcanaNumber) {
+  console.log(`[compatibility.update] Обновление ${sphereId} с арканом ${arcanaNumber}`);
+  
   const descriptionData = getCompatibilityDescription(arcanaNumber, sphereId);
   
   if (!descriptionData) {
-    console.warn('[compatibility] Не удалось получить расшифровку для', sphereId, arcanaNumber);
+    console.warn('[compatibility.update] Не удалось получить расшифровку для', sphereId, arcanaNumber);
     return;
   }
 
   // Находим контейнер sphere-item по ID сферы
   const sphereItem = document.getElementById(sphereId);
   if (!sphereItem) {
-    console.warn('[compatibility] sphere-item не найден для', sphereId);
+    console.warn('[compatibility.update] sphere-item не найден для', sphereId);
     return;
   }
 
@@ -79,12 +90,13 @@ function updateCompatibilitySphereContent(sphereId, arcanaNumber) {
   const arcanaElement = sphereItem.querySelector(`#${sphereId}-arcana`);
   if (arcanaElement) {
     arcanaElement.textContent = arcanaNumber;
+    console.log(`[compatibility.update] Установлен номер аркана ${arcanaNumber} для ${sphereId}`);
   }
 
   // Находим блок с описанием внутри этого sphere-item
   const descriptionBlock = sphereItem.querySelector('.sphere-description');
   if (!descriptionBlock) {
-    console.warn('[compatibility] Блок .sphere-description не найден в', sphereId);
+    console.warn('[compatibility.update] Блок .sphere-description не найден в', sphereId);
     return;
   }
 
@@ -92,7 +104,7 @@ function updateCompatibilitySphereContent(sphereId, arcanaNumber) {
   const formattedText = formatCompatibilityDescription(descriptionData.text, descriptionData.title);
   descriptionBlock.innerHTML = formattedText;
   
-  console.log('[compatibility] Обновлен блок', sphereId, 'с арканом', arcanaNumber);
+  console.log('[compatibility.update] Блок успешно обновлён:', sphereId);
 }
 
 // Функция для заполнения всех блоков совместимости
@@ -102,7 +114,9 @@ function fillCompatibilitySpheres(compatibility) {
     return;
   }
 
-  console.log('[compatibility] Начало заполнения блоков совместимости', compatibility);
+  console.log('[compatibility] Начало заполнения блоков совместимости');
+  console.log('[compatibility] Доступные точки:', Object.keys(compatibility.points));
+  console.log('[compatibility] Значение spoint:', compatibility.points.spoint);
 
   // Маппинг сфер совместимости на расчётные точки матрицы
   const sphereArcanaMapping = {
@@ -122,6 +136,8 @@ function fillCompatibilitySpheres(compatibility) {
     'sphere-14': compatibility.points.vpoint          // Привязанность - точка V (заблокировано)
   };
 
+  console.log('[compatibility] Маппинг сфер:', sphereArcanaMapping);
+
   // Список заблокированных сфер (все кроме первых двух)
   const lockedSpheres = ['sphere-3', 'sphere-4', 'sphere-5', 'sphere-6', 'sphere-7', 
                          'sphere-8', 'sphere-9', 'sphere-10', 'sphere-11', 'sphere-12',
@@ -129,11 +145,15 @@ function fillCompatibilitySpheres(compatibility) {
 
   // Заполняем каждый блок
   for (const [sphereId, arcanaNumber] of Object.entries(sphereArcanaMapping)) {
+    console.log(`[compatibility] Обработка ${sphereId}, аркан: ${arcanaNumber}`);
+    
     // Загружаем расшифровку только для незаблокированных сфер
     if (!lockedSpheres.includes(sphereId)) {
+      console.log(`[compatibility] ${sphereId} не заблокирована, загружаем содержимое`);
       updateCompatibilitySphereContent(sphereId, arcanaNumber);
     } else {
       // Для заблокированных сфер только устанавливаем номер аркана
+      console.log(`[compatibility] ${sphereId} заблокирована, только номер аркана`);
       const sphereItem = document.getElementById(sphereId);
       if (sphereItem) {
         const arcanaElement = sphereItem.querySelector(`#${sphereId}-arcana`);
@@ -141,7 +161,6 @@ function fillCompatibilitySpheres(compatibility) {
           arcanaElement.textContent = arcanaNumber;
         }
       }
-      console.log('[compatibility] sphere is locked, skipping content load', { sphereId });
     }
   }
 }
