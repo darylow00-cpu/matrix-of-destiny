@@ -74,6 +74,14 @@ async function handlePaymentClick() {
     } catch (error) {
         hideLoadingIndicator();
         console.error('Ошибка при обработке платежа:', error);
+        
+        // Показываем детали ошибки для отладки на мобильных
+        const errorDetails = `Тип: ${error.name}\nСообщение: ${error.message}\nСтек: ${error.stack?.substring(0, 100) || 'нет'}`;
+        console.log('[payment_handler] Error details:', errorDetails);
+        
+        // Временно показываем alert для отладки на мобильных
+        alert('Ошибка оплаты:\n' + error.name + '\n' + error.message);
+        
         showErrorMessage('Произошла ошибка. Попробуйте позже.');
     }
 }
