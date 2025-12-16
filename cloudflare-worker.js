@@ -207,8 +207,15 @@ function jsonResponse(data, status, request) {
 export default {
   async fetch(request, env) {
     // Переопределяем константы из environment variables, если они есть
-    const SHOP_ID_ENV = env.YOOKASSA_SHOP_ID || SHOP_ID;
-    const SECRET_KEY_ENV = env.YOOKASSA_SECRET_KEY || SECRET_KEY;
+    const SHOP_ID_ENV = (env.YOOKASSA_SHOP_ID || SHOP_ID || '').trim();
+    const SECRET_KEY_ENV = (env.YOOKASSA_SECRET_KEY || SECRET_KEY || '').trim();
+    if (!SHOP_ID_ENV || !SECRET_KEY_ENV) {
+      console.log('YOOKASSA config missing', { shopId: SHOP_ID_ENV, secretEmpty: !SECRET_KEY_ENV });
+      return new Response(JSON.stringify({ error: 'Missing SHOP_ID or SECRET_KEY' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders(request.headers.get('Origin') || '*') }
+      });
+    }
     
     const url = new URL(request.url);
     const path = url.pathname;
@@ -221,6 +228,7 @@ export default {
     
     // Роутинг
     if (path === '/create-payment' && method === 'POST') {
+      console.log('YOOKASSA create-payment using shopId', SHOP_ID_ENV, 'key prefix', SECRET_KEY_ENV.slice(0, 6));
       return createPayment(request, SHOP_ID_ENV, SECRET_KEY_ENV);
     }
     
