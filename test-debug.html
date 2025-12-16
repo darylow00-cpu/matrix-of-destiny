@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: Arial;
+        }
+        #debug {
+            background: #ff6b6b;
+            color: #000;
+            padding: 20px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="debug">
+        LOADING...
+    </div>
+
+    <script>
+        (function() {
+            const vw = window.innerWidth;
+            const dw = document.documentElement.scrollWidth;
+            const bw = document.body.scrollWidth;
+            const maxW = Math.max(dw, bw);
+            const overflow = maxW - vw;
+            
+            let output = `╔═══════════════════════════════════╗\n`;
+            output += `║  VIEWPORT OVERFLOW ANALYZER      ║\n`;
+            output += `╚═══════════════════════════════════╝\n\n`;
+            output += `Window Width: ${vw}px\n`;
+            output += `Document Width: ${dw}px\n`;
+            output += `Body Width: ${bw}px\n`;
+            output += `Max Width: ${maxW}px\n`;
+            output += `OVERFLOW AMOUNT: ${overflow}px\n\n`;
+            
+            const overflowingElements = [];
+            
+            document.querySelectorAll('*').forEach((el, idx) => {
+                const rect = el.getBoundingClientRect();
+                const styles = window.getComputedStyle(el);
+                
+                if (rect.right > vw + 1) {
+                    overflowingElements.push({
+                        index: idx,
+                        tag: el.tagName,
+                        id: el.id,
+                        className: el.className,
+                        width: rect.width,
+                        left: rect.left,
+                        right: rect.right,
+                        overflowAmount: rect.right - vw,
+                        display: styles.display,
+                        position: styles.position
+                    });
+                }
+            });
+            
+            overflowingElements.sort((a, b) => b.overflowAmount - a.overflowAmount);
+            
+            if (overflowingElements.length > 0) {
+                output += `FOUND ${overflowingElements.length} OVERFLOWING ELEMENTS:\n\n`;
+                
+                overflowingElements.slice(0, 10).forEach((item, i) => {
+                    output += `─────────────────────────────────\n`;
+                    output += `#${i + 1}\n`;
+                    output += `Tag: ${item.tag}\n`;
+                    if (item.id) output += `ID: ${item.id}\n`;
+                    if (item.className) output += `Class: ${item.className.substring(0, 60)}\n`;
+                    output += `Width: ${item.width.toFixed(0)}px\n`;
+                    output += `Left: ${item.left.toFixed(0)}px\n`;
+                    output += `Right: ${item.right.toFixed(0)}px\n`;
+                    output += `OVERFLOW: +${item.overflowAmount.toFixed(0)}px ⚠️\n`;
+                    output += `Display: ${item.display}\n`;
+                    output += `Position: ${item.position}\n\n`;
+                });
+            } else {
+                output += `✅ NO OVERFLOW ELEMENTS FOUND!\n`;
+            }
+            
+            document.getElementById('debug').textContent = output;
+        })();
+    </script>
+</body>
+</html>
