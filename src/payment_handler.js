@@ -198,63 +198,31 @@ function showLoadingIndicator() {
     const button = document.getElementById('decode-matrix-btn');
     if (button) {
         button.disabled = true;
+        button.dataset.originalText = button.textContent;
+        // Маленькие пульсирующие точки (не двигаются)
+        button.innerHTML = `
+            <span style="display: inline-flex; align-items: center; gap: 4px;">
+                Переход к оплате
+                <span style="display: inline-flex; gap: 3px; margin-left: 4px;">
+                    <span style="width: 4px; height: 4px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
+                    <span style="width: 4px; height: 4px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.3s infinite;"></span>
+                    <span style="width: 4px; height: 4px; background: white; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.6s infinite;"></span>
+                </span>
+            </span>
+        `;
     }
     
-    // Добавить анимацию вращения, если её ещё нет
-    if (!document.getElementById('spin-animation')) {
+    // Добавить анимацию пульсации, если её ещё нет
+    if (!document.getElementById('pulse-animation')) {
         const style = document.createElement('style');
-        style.id = 'spin-animation';
+        style.id = 'pulse-animation';
         style.textContent = `
-            @keyframes spin {
-                to { transform: rotate(360deg); }
+            @keyframes pulse {
+                0%, 100% { opacity: 0.3; }
+                50% { opacity: 1; }
             }
         `;
         document.head.appendChild(style);
-    }
-
-    // Создать фиксированный оверлей с индикатором загрузки (не двигает контент)
-    if (!document.getElementById('payment-loading-overlay')) {
-        const overlay = document.createElement('div');
-        overlay.id = 'payment-loading-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        `;
-        overlay.innerHTML = `
-            <div style="
-                background: white;
-                border-radius: 12px;
-                padding: 24px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 16px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            ">
-                <span style="
-                    width: 40px;
-                    height: 40px;
-                    border: 3px solid #e0e0e0;
-                    border-top-color: #b653f7;
-                    border-radius: 50%;
-                    animation: spin 0.8s linear infinite;
-                "></span>
-                <span style="
-                    font-size: 14px;
-                    color: #333;
-                    font-weight: 500;
-                ">Переход к оплате...</span>
-            </div>
-        `;
-        document.body.appendChild(overlay);
     }
 }
 
@@ -263,14 +231,9 @@ function showLoadingIndicator() {
  */
 function hideLoadingIndicator() {
     const button = document.getElementById('decode-matrix-btn');
-    if (button) {
+    if (button && button.dataset.originalText) {
         button.disabled = false;
-    }
-
-    // Удалить оверлей с индикатором загрузки
-    const overlay = document.getElementById('payment-loading-overlay');
-    if (overlay) {
-        overlay.remove();
+        button.textContent = button.dataset.originalText;
     }
 }
 
