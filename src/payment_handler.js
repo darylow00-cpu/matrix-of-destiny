@@ -19,13 +19,42 @@ function waitForPaymentService(retries = 5, delayMs = 300) {
     }
 
     if (retries <= 0) {
-        console.error('[payment_handler] PaymentService not loaded after retries');
-        alert('Ошибка загрузки модуля оплаты. Обновите страницу или попробуйте другой браузер.');
+        console.error('[payment_handler] PaymentService not loaded after retries. Trying to reload payment.js');
+        loadPaymentScript(() => {
+            if (typeof PaymentService !== 'undefined') {
+                console.log('[payment_handler] PaymentService loaded after dynamic script reload');
+                const paymentButton = document.getElementById('decode-matrix-btn');
+                if (paymentButton) {
+                    paymentButton.addEventListener('click', handlePaymentClick);
+                }
+            } else {
+                alert('Ошибка загрузки модуля оплаты. Обновите страницу или попробуйте другой браузер.');
+            }
+        });
         return;
     }
 
     console.warn('[payment_handler] PaymentService not ready, retrying... attempts left:', retries);
     setTimeout(() => waitForPaymentService(retries - 1, delayMs), delayMs);
+}
+
+// Динамическая подгрузка payment.js при сбое (для мобильных, когда кеш сломан)
+function loadPaymentScript(onLoaded) {
+    const existing = document.querySelector('script[data-dynamic-payment="true"]');
+    if (existing) existing.remove();
+    const script = document.createElement('script');
+    script.src = `./src/payment.js?v=2025-12-16q&reload=${Date.now()}`;
+    script.async = false;
+    script.dataset.dynamicPayment = 'true';
+    script.onload = () => {
+        console.log('[payment_handler] payment.js dynamically loaded');
+        onLoaded && onLoaded();
+    };
+    script.onerror = () => {
+        console.error('[payment_handler] Failed to dynamically load payment.js');
+        alert('Не удалось загрузить модуль оплаты. Попробуйте обновить страницу.');
+    };
+    document.head.appendChild(script);
 }
 
 /**

@@ -2,6 +2,8 @@
  * Клиентская часть для интеграции с платежной системой ЮKassa
  */
 
+console.info('[payment] payment.js loaded');
+
 const PaymentService = {
     // URL сервера обработки платежей: авто-переключение dev/prod
     serverUrl: (function() {
