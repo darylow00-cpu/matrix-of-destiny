@@ -1419,6 +1419,27 @@ tbody {
     max-width: 100vw !important;
   }
 
+  .star__wrap1,
+  .star__wrap2,
+  .star__wrap3,
+  .star__wrap4,
+  .star__wrap5,
+  .star__wrap6,
+  .star__wrap7,
+  .star__wrap8,
+  .star__wrap9,
+  .star__wrap10,
+  .star__wrap11,
+  .star__wrap12,
+  .star__wrap13,
+  .star__wrap14,
+  .star__wrap15,
+  .star__wrap16,
+  .star__wrap17,
+  .star__wrap18 {
+    display: none !important;
+  }
+
   header,
   main,
   footer {
@@ -1513,6 +1534,27 @@ tbody {
   .container {
     padding-left: 0 !important;
     padding-right: 0 !important;
+  }
+
+  .star__wrap1,
+  .star__wrap2,
+  .star__wrap3,
+  .star__wrap4,
+  .star__wrap5,
+  .star__wrap6,
+  .star__wrap7,
+  .star__wrap8,
+  .star__wrap9,
+  .star__wrap10,
+  .star__wrap11,
+  .star__wrap12,
+  .star__wrap13,
+  .star__wrap14,
+  .star__wrap15,
+  .star__wrap16,
+  .star__wrap17,
+  .star__wrap18 {
+    display: none !important;
   }
 
   body {
