@@ -247,11 +247,17 @@ btnChart.addEventListener('click', (evt) => {
                 };
         
                 // Заполняем блоки совместимости (если функция определена)
+                console.log('[inputs_compat] Проверка fillCompatibilitySpheres:', typeof fillCompatibilitySpheres);
+                console.log('[inputs_compat] Объект совместимости:', compatibility);
                 if (typeof fillCompatibilitySpheres === 'function') {
+                    console.log('[inputs_compat] Вызов fillCompatibilitySpheres');
                     fillCompatibilitySpheres(compatibility);
+                } else {
+                    console.warn('[inputs_compat] fillCompatibilitySpheres НЕ является функцией!');
                 }
                 
                 // Показываем блоки сфер на мобильных
+                console.log('[inputs_compat] Показываем блоки совместимости, элемент найден:', !!compatibilitySpheresSection);
                 if (compatibilitySpheresSection) {
                     compatibilitySpheresSection.classList.add('show');
                 }
