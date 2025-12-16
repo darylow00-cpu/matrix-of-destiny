@@ -55,7 +55,7 @@ function handleOptions(request) {
 }
 
 // Создание платежа
-async function createPayment(request) {
+async function createPayment(request, shopId, secretKey) {
   try {
     const data = await request.json();
     const serviceType = data.service_type || 'personal';
@@ -92,7 +92,7 @@ async function createPayment(request) {
     }
     
     // Отправка запроса к ЮKassa
-    const auth = btoa(`${SHOP_ID}:${SECRET_KEY}`);
+    const auth = btoa(`${shopId}:${secretKey}`);
     const response = await fetch(YOOKASSA_API_URL, {
       method: 'POST',
       headers: {
@@ -125,9 +125,9 @@ async function createPayment(request) {
 }
 
 // Проверка статуса платежа
-async function checkPayment(paymentId, request) {
+async function checkPayment(paymentId, request, shopId, secretKey) {
   try {
-    const auth = btoa(`${SHOP_ID}:${SECRET_KEY}`);
+    const auth = btoa(`${shopId}:${secretKey}`);
     const response = await fetch(`${YOOKASSA_API_URL}/${paymentId}`, {
       method: 'GET',
       headers: {
@@ -217,12 +217,12 @@ export default {
     
     // Роутинг
     if (path === '/create-payment' && method === 'POST') {
-      return createPayment(request);
+      return createPayment(request, SHOP_ID_ENV, SECRET_KEY_ENV);
     }
     
     if (path.startsWith('/check-payment/') && method === 'GET') {
       const paymentId = path.split('/check-payment/')[1];
-      return checkPayment(paymentId, request);
+      return checkPayment(paymentId, request, SHOP_ID_ENV, SECRET_KEY_ENV);
     }
     
     if (path === '/webhook' && method === 'POST') {
