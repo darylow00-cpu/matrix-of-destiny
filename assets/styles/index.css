@@ -1247,6 +1247,10 @@ h3 {
   display: none;
 }
 
+.compatibility-spheres {
+  display: none;
+}
+
 /* Улучшение стилизации таблиц совместимости */
 #table-compatibility {
   box-shadow: 
@@ -1565,6 +1569,10 @@ tbody {
   }
 
   .compatibility-table__adaptiv {
+    display: block;
+  }
+
+  .compatibility-spheres {
     display: block;
   }
 
