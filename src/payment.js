@@ -145,7 +145,17 @@ const PaymentService = {
      */
     async handlePaymentReturn() {
         const paymentId = localStorage.getItem('currentPaymentId');
-        if (!paymentId) return;
+        const desired = localStorage.getItem('paymentReturnUrl');
+        // Если платежа нет, но есть сохраненный returnUrl, вернуть пользователя обратно
+        if (!paymentId) {
+            if (desired && desired !== window.location.href) {
+                localStorage.removeItem('paymentReturnUrl');
+                window.location.href = desired;
+                return;
+            }
+            localStorage.removeItem('paymentReturnUrl');
+            return;
+        }
 
         const result = await this.checkPayment(paymentId);
         // Очистим ID, чтобы не зациклить проверки
@@ -163,7 +173,6 @@ const PaymentService = {
         }
 
         // Вернуться на исходную страницу расчета, если сохраняли return_url
-        const desired = localStorage.getItem('paymentReturnUrl');
         if (desired && desired !== window.location.href) {
             localStorage.removeItem('paymentReturnUrl');
             window.location.href = desired;
