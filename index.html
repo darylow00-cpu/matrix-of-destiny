@@ -62,12 +62,12 @@
       </nav>
     </header>
     <main>
-      <div id="debug-info" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.95); color: #0f0; padding: 15px; border: 3px solid #0f0; font-family: monospace; font-size: 11px; z-index: 999999; border-radius: 8px; line-height: 1.5; max-width: 280px; pointer-events: none;">
-        <strong>DEBUG INFO</strong><br>
-        <span id="debug-content">Loading...</span>
-      </div>
       <div class="container">
         <div class="desteny-container">
+          <div id="debug-panel" style="background: #1a1a2e; color: #00ff00; padding: 20px; margin: 20px 0; border: 2px solid #00ff00; font-family: monospace; font-size: 12px; border-radius: 5px; width: 100%; box-sizing: border-box;">
+            <strong>🔍 DEBUG PANEL</strong><br>
+            <span id="debug-text">Analyzing...</span>
+          </div>
           <div class="glow__wrap">
             <div class="glow"></div>
           </div>
@@ -1687,16 +1687,15 @@
     <!-- Debug script - remove in production -->
     <script>
       (function() {
-        setTimeout(() => {
+        function runDebug() {
           const vw = window.innerWidth;
           const dw = document.documentElement.scrollWidth;
           const bw = document.body.scrollWidth;
           const maxW = Math.max(dw, bw);
           const overflow = maxW - vw;
           
-          let info = `📱 Viewport: ${vw}px<br>`;
-          info += `📄 Doc: ${dw}px | Body: ${bw}px<br>`;
-          info += `⚠️ Overflow: ${overflow}px<br><br>`;
+          let info = `📱 Viewport: ${vw}px | Doc: ${dw}px | Body: ${bw}px<br>`;
+          info += `⚠️ Total Overflow: ${overflow}px<br><br>`;
           
           const overElements = [];
           document.querySelectorAll('*').forEach(el => {
@@ -1704,8 +1703,8 @@
             if (r.right > vw + 2) {
               overElements.push({
                 tag: el.tagName,
-                cls: el.className.split(' ')[0] || '-',
-                id: el.id || '-',
+                cls: el.className,
+                id: el.id,
                 width: Math.round(r.width),
                 over: Math.round(r.right - vw)
               });
@@ -1715,22 +1714,31 @@
           overElements.sort((a,b) => b.over - a.over);
           
           if (overElements.length > 0) {
-            info += '<strong style="color:#f00">⚠️ OVERFLOW:</strong><br>';
+            info += '<strong style="color:#ff6b6b">🚨 CULPRITS (top 5):</strong><br>';
             overElements.slice(0, 5).forEach((item, i) => {
-              const sel = item.id !== '-' ? `#${item.id}` : item.cls !== '-' ? `.${item.cls}` : item.tag;
-              info += `${i+1}. ${sel}<br>`;
-              info += `   +${item.over}px<br>`;
+              info += `${i+1}. Tag: ${item.tag}<br>`;
+              if (item.id) info += `   ID: ${item.id}<br>`;
+              if (item.cls) info += `   Class: ${item.cls.substring(0, 50)}<br>`;
+              info += `   Overflow: +${item.over}px (width: ${item.width}px)<br><br>`;
             });
           } else {
-            info += '<strong style="color:#0f0">✅ NO OVERFLOW</strong>';
+            info += '<strong style="color:#51cf66">✅ NO OVERFLOW DETECTED!</strong>';
           }
           
-          document.getElementById('debug-content').innerHTML = info;
-        }, 1500);
+          const debugEl = document.getElementById('debug-text');
+          if (debugEl) {
+            debugEl.innerHTML = info;
+          }
+        }
+        
+        // Run immediately
+        runDebug();
+        // Run again after page loads
+        window.addEventListener('load', runDebug);
+        // Run every 2 seconds
+        setInterval(runDebug, 2000);
       })();
     </script>
-    <script src="./debug-overlay.js?v=2025-12-16aj"></script>
-    <script src="./debug-overflow.js?v=2025-12-16aj"></script>
   </body>
 </html>
 
